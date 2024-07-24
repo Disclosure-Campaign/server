@@ -1,21 +1,27 @@
 import requests
+from server.config import get_config
 
-from server.config import CONGRESS_API_KEY
+config = get_config()
+
+CONGRESS_GOV_API_KEY = config.CONGRESS_GOV_API_KEY
 
 data_type_map = {
     'congressMembers': 'member'
 }
 
-congress_gov_api = {}
-
 base_url = "api.congress.gov/v3"
 
 def request_data(params):
     result = None
-
     data_type = data_type_map[params['data_type']]
 
-    url = f'https://{base_url}/{data_type}?api_key={CONGRESS_API_KEY}'
+    url = f'https://{base_url}/{data_type}'
+
+    if data_type == 'member':
+        if 'bio_id' in params:
+            url += f'/{params['bio_id']}'
+
+    url += '?api_key={CONGRESS_GOV_API_KEY}'
 
     try:
         # Make the GET request
@@ -34,4 +40,6 @@ def request_data(params):
 
     return result
 
-congress_gov_api['request_data'] = request_data
+congress_gov_api = {
+    'request_data': request_data
+}
