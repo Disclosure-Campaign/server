@@ -1,0 +1,37 @@
+2024-08-10 14:05:01.532 EDT [13555] LOG:  starting PostgreSQL 14.13 (Homebrew) on x86_64-apple-darwin22.6.0, compiled by Apple clang version 15.0.0 (clang-1500.1.0.2.5), 64-bit
+2024-08-10 14:05:01.534 EDT [13555] LOG:  listening on IPv6 address "::1", port 5432
+2024-08-10 14:05:01.535 EDT [13555] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2024-08-10 14:05:01.535 EDT [13555] LOG:  listening on Unix socket "/tmp/.s.PGSQL.5432"
+2024-08-10 14:05:01.539 EDT [13556] LOG:  database system was shut down at 2024-08-10 14:04:54 EDT
+2024-08-10 14:05:01.542 EDT [13555] LOG:  database system is ready to accept connections
+2024-08-10 14:05:08.212 EDT [13584] FATAL:  role "admin" does not exist
+2024-08-10 14:07:07.323 EDT [13651] FATAL:  role "admin" does not exist
+2024-08-10 14:08:54.926 EDT [13699] FATAL:  role "admin" does not exist
+2024-08-10 14:09:12.218 EDT [13717] FATAL:  database "justinposer" does not exist
+2024-08-10 14:14:48.233 EDT [13855] FATAL:  role "postgres" does not exist
+2024-08-10 14:15:19.302 EDT [13881] FATAL:  database "justinposer" does not exist
+2024-08-10 14:17:29.240 EDT [13977] ERROR:  database "your_database" does not exist
+2024-08-10 14:17:29.240 EDT [13977] STATEMENT:  GRANT ALL PRIVILEGES ON DATABASE your_database TO admin;
+2024-08-10 14:17:48.394 EDT [14000] FATAL:  database "disclosure_campaign" does not exist
+2024-08-11 12:17:52.988 EDT [16844] FATAL:  database "justinposer" does not exist
+2024-08-11 12:18:00.616 EDT [16855] FATAL:  database "disclosure_campaign" does not exist
+2024-08-11 12:18:53.303 EDT [16894] FATAL:  database "disclosure_campaign" does not exist
+2024-08-11 12:19:58.855 EDT [16969] ERROR:  syntax error at or near "NOT" at character 20
+2024-08-11 12:19:58.855 EDT [16969] STATEMENT:  CREATE DATABASE IF NOT EXISTS disclosure_campaign
+2024-08-11 12:21:11.572 EDT [17021] ERROR:  CREATE DATABASE cannot run inside a transaction block
+2024-08-11 12:21:11.572 EDT [17021] STATEMENT:  CREATE DATABASE disclosure_campaign
+2024-08-11 12:22:09.428 EDT [17073] ERROR:  syntax error at or near "\" at character 1
+2024-08-11 12:22:09.428 EDT [17073] STATEMENT:  \set AUTOCOMMIT on
+2024-08-11 12:22:24.846 EDT [17094] ERROR:  syntax error at or near "on" at character 16
+2024-08-11 12:22:24.846 EDT [17094] STATEMENT:  set AUTOCOMMIT on
+2024-08-11 12:22:36.688 EDT [17116] ERROR:  unrecognized configuration parameter "autocommit"
+2024-08-11 12:22:36.688 EDT [17116] STATEMENT:  set AUTOCOMMIT = on
+2024-08-11 20:54:11.774 EDT [22808] FATAL:  database "justinposer" does not exist
+2024-08-11 20:57:55.125 EDT [22978] ERROR:  value too long for type character varying(15)
+2024-08-11 20:57:55.125 EDT [22978] STATEMENT:  UPDATE politician SET "lastUpdated"='2024-08-11T20:57:55.120077'::timestamp, "candidateElectionYear"='2024', "candidateOfficeState"='AL', "candidateOffice"='H', "candidateOfficeDistrict"='01', "candidateIncumbent"='I', "candidateStatus"='C', "candidateStreet1"='PO BOX 852138', "candidateCity"='MOBILE', "candidateState"='AL', "candidateZip"='36685', party='Republican Party', "fullName"='Jerry Lee Carl Jr.' WHERE politician."candidateId1" = 'H0AL01055'
+2024-08-11 23:48:27.644 EDT [24624] ERROR:  value too long for type character varying(15)
+2024-08-11 23:48:27.644 EDT [24624] STATEMENT:  UPDATE politician SET "lastUpdated"='2024-08-11T23:48:27.638335'::timestamp, "candidateElectionYear"='2024', "candidateOfficeState"='AL', "candidateOffice"='H', "candidateOfficeDistrict"='01', "candidateIncumbent"='I', "candidateStatus"='C', "candidateStreet1"='PO BOX 852138', "candidateCity"='MOBILE', "candidateState"='AL', "candidateZip"='36685', party='Republican Party', "fullName"='Jerry Lee Carl Jr.' WHERE politician."candidateId1" = 'H0AL01055'
+2024-08-11 23:52:27.468 EDT [24756] ERROR:  invalid input syntax for type integer: "" at character 650
+2024-08-11 23:52:27.468 EDT [24756] STATEMENT:  INSERT INTO politician ("candidateId1", "lastUpdated", "candidateId2", "candidateId3", "candidateElectionYear", "candidateOfficeState", "candidateOffice", "candidateOfficeDistrict", "candidateIncumbent", "candidateStatus", "candidateStreet1", "candidateStreet2", "candidateCity", "candidateState", "candidateZip", "bioguideId", "depictionAttribution", "depictionImageUrl", district, "firstName", "lastName", state, party, "middleName", "fullName", birthday, type, website, phone, "contactForm", twitter, facebook) VALUES ('H0AL02087', '2024-08-11T23:52:27.466285'::timestamp, NULL, NULL, '2020', 'AL', 'H', '02', 'I', 'P', '', '', 'MONTGOMERY', '', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Republican Party', NULL, 'Martha Roby', NULL, NULL, NULL, NULL, NULL, NULL, NULL)
+2024-08-12 12:54:39.575 EDT [28449] ERROR:  value too long for type character varying(40)
+2024-08-12 12:54:39.575 EDT [28449] STATEMENT:  INSERT INTO politician ("candidateId1", "lastUpdated", "candidateId2", "candidateId3", "candidateElectionYear", "candidateOfficeState", "candidateOffice", "candidateOfficeDistrict", "candidateIncumbent", "candidateStatus", "candidateStreet1", "candidateStreet2", "candidateCity", "candidateState", "candidateZip", "bioguideId", "depictionAttribution", "depictionImageUrl", district, "firstName", "lastName", state, party, "middleName", "fullName", birthday, type, website, phone, "contactForm", twitter, facebook) VALUES ('H2CA27230', '2024-08-12T12:54:39.570643'::timestamp, NULL, NULL, '2024', 'CA', 'H', '18', 'C', 'N', '777 1ST ST PMB 510', '', 'GILROY', 'CA', '95020', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Other', NULL, 'Autiameineire Fepbrina Estrelvia Keivaulqe', NULL, NULL, NULL, NULL, NULL, NULL, NULL)

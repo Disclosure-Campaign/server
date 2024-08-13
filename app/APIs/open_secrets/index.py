@@ -1,5 +1,5 @@
 import requests
-from server.config import get_config
+from app.config import get_config
 
 config = get_config()
 
@@ -17,12 +17,9 @@ def request_searchable_entities():
     url = f'https://{base_url}/?method=getLegislators&id=NJ&apikey={OPEN_SECRETS_API_KEY}'
 
     try:
-        # Make the GET request
         response = requests.get(url)
 
-        # Check if the request was successful
         if response.status_code == 200:
-            # Parse the JSON response
             result = response.json()
         else:
             print(f"Error: API request failed with status code {response.status_code}")
