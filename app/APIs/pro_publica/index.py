@@ -11,7 +11,7 @@ data_type_map = {
 
 base_url = 'api.propublica.org/campaign-finance/v1'
 
-def request_data(params):
+def request_standard_data(params):
     result = None
     data_type = data_type_map[params['data_type']]
     name = params['name']
@@ -44,5 +44,5 @@ def request_data(params):
 
 
 congress_gov_api = {
-    'request_data': request_data
+    'request_standard_data': request_standard_data
 }

@@ -12,7 +12,7 @@ data_type_map = {
 
 base_url = 'api.open.fec.gov/v1'
 
-def request_data(params):
+def request_standard_data(params):
     result = None
     data_type = data_type_map[params['data_type']]
     name = params['name']
@@ -93,6 +93,6 @@ def request_all_candidates(election_year):
     return result
 
 open_fec_api = {
-    'request_data': request_data,
+    'request_standard_data': request_standard_data,
     'request_all_candidates': request_all_candidates
 }

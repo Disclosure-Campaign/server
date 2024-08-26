@@ -1,12 +1,14 @@
 import re
+from sqlalchemy import or_
 from fuzzywuzzy import fuzz
-from .db.static_data.states import states
+
+from app.db.schemas.models import Politician
 
 def split_name(raw_name):
     titles = ['Dr', 'Sr', 'Jr', 'Mr', 'Mrs', 'Iii']
 
     name = raw_name.title()
-    name = re.sub(r'[^\w\s]', '', name)
+    name = re.sub(r'[^\w\s-]', '', name)
     parts = re.split(r'[,\s]+', name)
 
     name_parts = [part for part in parts if part not in titles]
@@ -56,76 +58,94 @@ def add_candidate_fields(input_politician):
     politician['firstName'] = first_name
 
     politician['label'] = construct_name([last_name, first_name, middle_name, titles])
-    politician['id'] = politician['candidate_id']
+    politician['id'] = politician['fec_id']
     politician['type'] = 'politician'
+
+    return politician
+
+
+def find_politician(session, ids):
+    fec_id = ids.get('fecId', 'N/A')
+    opensecrets_id = ids.get('opensecretsId', 'N/A')
+
+    politician = session.query(Politician).filter(
+        or_(
+            Politician.fecId1 == fec_id,
+            Politician.fecId2 == fec_id,
+            Politician.fecId3 == fec_id,
+            Politician.opensecretsId == opensecrets_id
+        )
+    ).first()
 
     return politician
 
 def fuzzy_match(name1, name2, threshold=80):
     return fuzz.token_sort_ratio(name1, name2) >= threshold
 
-def stitch(candidates, congress_members):
-    candidate_count = len(candidates)
-    unmatched_congress_member_count = len(congress_members)
 
-    members_by_name = {
-        normalize_name(member['name']): member for member in congress_members
-    }
 
-    politicians = []
-    index = 0
+# def stitch(candidates, congress_members):
+#     candidate_count = len(candidates)
+#     unmatched_congress_member_count = len(congress_members)
 
-    while index < candidate_count:
-        candidate = candidates[index]
-        politician = add_candidate_fields(candidate)
+#     members_by_name = {
+#         normalize_name(member['name']): member for member in congress_members
+#     }
 
-        state = states[politician['state']]
+#     politicians = []
+#     index = 0
 
-        if politician['incumbent_challenge'] == 'I':
-            candidate_name = politician['label']
-            _match = None
+#     while index < candidate_count:
+#         candidate = candidates[index]
+#         politician = add_candidate_fields(candidate)
 
-            if candidate_name in members_by_name:
-                _match = members_by_name[candidate_name]
-            else:
-                for name in members_by_name.keys():
-                    if fuzzy_match(candidate_name, name):
-                        print(f'{candidate_name} matched with {name}')
-                        if members_by_name[name]['state'] == state:
-                            _match = members_by_name[name]
+#         state = states[politician['state']]
 
-                            break
-                        else:
-                            print('incorrect state')
+#         if politician['incumbent_challenge'] == 'I':
+#             candidate_name = politician['label']
+#             _match = None
 
-            if _match is not None:
-                politician = politician | _match
-                unmatched_congress_member_count -= 1
-            else:
-                print('unmatched:')
-                print(politician)
+#             if candidate_name in members_by_name:
+#                 _match = members_by_name[candidate_name]
+#             else:
+#                 for name in members_by_name.keys():
+#                     if fuzzy_match(candidate_name, name):
+#                         print(f'{candidate_name} matched with {name}')
+#                         if members_by_name[name]['state'] == state:
+#                             _match = members_by_name[name]
 
-        politicians.append(politician)
-        index += 1
+#                             break
+#                         else:
+#                             print('incorrect state')
 
-    print(f'unmatched congress members: {unmatched_congress_member_count}')
+#             if _match is not None:
+#                 politician = politician | _match
+#                 unmatched_congress_member_count -= 1
+#             else:
+#                 print('unmatched:')
+#                 print(politician)
 
-    return politicians
+#         politicians.append(politician)
+#         index += 1
 
-def combine_lists(list1, list2, key):
-    combined_list = []
-    seen_ids = set()
+#     print(f'unmatched congress members: {unmatched_congress_member_count}')
 
-    print(f'1: {len(list1)}')
-    print(f'2: {len(list2)}')
+#     return politicians
 
-    for item in list1 + list2:
-        if item[key] not in seen_ids:
-            combined_list.append(item)
-            seen_ids.add(item[key])
-        else:
-            print(item)
+# def combine_lists(list1, list2, key):
+#     combined_list = []
+#     seen_ids = set()
 
-    print(f'3: {len(combined_list)}')
+#     print(f'1: {len(list1)}')
+#     print(f'2: {len(list2)}')
 
-    return combined_list
+#     for item in list1 + list2:
+#         if item[key] not in seen_ids:
+#             combined_list.append(item)
+#             seen_ids.add(item[key])
+#         else:
+#             print(item)
+
+#     print(f'3: {len(combined_list)}')
+
+#     return combined_list

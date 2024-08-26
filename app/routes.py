@@ -32,27 +32,30 @@ bp = Blueprint('api', __name__)
 def get_searchable_entities():
     params = request.args.to_dict()
 
-    cache_key = generate_cache_key(params, 'get_searchable_entities')
-    cache_data = check_cache(cache_key)
+    result = APIs['request_searchable_entities']()
 
-    if (cache_data is not None) and (ignore_cache is False):
-        print('using cache')
+    # cache_key = generate_cache_key(params, 'get_searchable_entities')
+    # cache_data = check_cache(cache_key)
 
-        result = cache_data
-    else:
-        result = APIs['request_searchable_entities']()
+    # if (cache_data is not None) and (ignore_cache is False):
+    #     print('using cache')
 
-        cache.set(cache_key, result, timeout=60*60*24)
+    #     result = cache_data
+    # else:
+    #     result = APIs['request_searchable_entities']()
+
+    #     cache.set(cache_key, result, timeout=60*60*24)
 
     return result
 
-@bp.route('/get_data')
+@bp.route('/request_standard_data')
 
-def request_specific_data():
+def request_standard_data():
     params = request.args.to_dict()
+    data_type = params['type']
 
-    result = APIs['get_data'](params)
-
+    if data_type == 'politician':
+        result = APIs['request_standard_politician_data'](params)
     if result:
         return jsonify(result)
     else:

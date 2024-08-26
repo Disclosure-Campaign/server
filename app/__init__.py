@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 
@@ -11,6 +12,8 @@ db = SQLAlchemy()
 
 def create_app():
     server = Flask(__name__)
+    CORS(server)
+
     config_class = get_config()
     server.config.from_object(config_class())
 

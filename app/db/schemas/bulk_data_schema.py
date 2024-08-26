@@ -1,9 +1,9 @@
 # www.fec.gov/campaign-finance-data/candidate-master-file-description
 
 candidate_fields = [
-  {'key': 'candidateId1', 'data_type': 'shortString'},
-  {'key': 'candidateId2', 'data_type': 'shortString'},
-  {'key': 'candidateId3', 'data_type': 'shortString'},
+  {'key': 'fecId1', 'data_type': 'shortString'},
+  {'key': 'fecId2', 'data_type': 'shortString'},
+  {'key': 'fecId3', 'data_type': 'shortString'},
   {'key': 'candidateElectionYear', 'data_type': 'integer'},
   {'key': 'candidateOfficeState', 'data_type': 'shortString'},
   {'key': 'candidateOffice', 'data_type': 'string'},
@@ -20,6 +20,7 @@ candidate_fields = [
 spreadsheet_fields = [
   {'key': 'middleName', 'data_type': 'string'},
   {'key': 'fullName', 'data_type': 'string'},
+  {'key': 'opensecretsId', 'data_type': 'string'},
   {'key': 'birthday', 'data_type': 'dateTime'},
   {'key': 'type', 'data_type': 'string'},
   {'key': 'website', 'data_type': 'longString'},

@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from schemas.models import Base, Politician
+from app.db.schemas.models import Base, Politician
 
 load_dotenv()
 
@@ -27,6 +27,7 @@ def insert_data(data):
             'lastName': row['last_name'],
             'fullName': row['full_name'],
             'bioguideId': row['bioguide_id'],
+            'opensecretsId': row['opensecrets_id'],
             'state': row['state'],
             'district': row['district'],
             'party': row['party'],
@@ -43,9 +44,9 @@ def insert_data(data):
             fec_ids = row['fec_ids'].split(',')
 
             for index, id in enumerate(fec_ids, 1):
-                column_values[f'candidateId{index}'] = id
+                column_values[f'fecId{index}'] = id
         else:
-            column_values['candidateId1'] = row['bioguide_id']
+            column_values['fecId1'] = row['bioguide_id']
 
         politician = Politician(**column_values)
 

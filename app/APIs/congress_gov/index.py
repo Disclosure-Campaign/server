@@ -1,6 +1,11 @@
 import requests
 from app.config import get_config
 
+from concurrent.futures import ThreadPoolExecutor
+import concurrent.futures
+
+from .cleaners import clean_bill_data
+
 config = get_config()
 
 CONGRESS_GOV_API_KEY = config.CONGRESS_GOV_API_KEY
@@ -13,69 +18,35 @@ base_url = 'api.congress.gov/v3'
 
 current_congress = 118
 
-def request_data(params):
-    result = None
-    data_type = data_type_map[params['data_type']]
+def request_bill_data(params):
+    bioguideId = params[0]
 
-    url = f'https://{base_url}/{data_type}'
+    url = f'https://{base_url}/member/'
 
-    if data_type == 'member':
-        if 'bio_id' in params:
-            bio_id = params['bio_id']
+    with ThreadPoolExecutor() as executor:
+        bill_futures = [
+            executor.submit(requests.get, bill_url)
+            for bill_url in [
+                f'{url}{bioguideId}/{method}?limit=250&api_key={CONGRESS_GOV_API_KEY}'
+                for method in ['sponsored-legislation', 'cosponsored-legislation']
+            ]
+        ]
 
-            url += f'/{bio_id}'
+        bill_data = []
+        types = ['sponsoredLegislation', 'cosponsoredLegislation']
 
-    url += f'?api_key={CONGRESS_GOV_API_KEY}'
+        for index, future in enumerate(concurrent.futures.as_completed(bill_futures)):
+            result = future.result().json()
 
-    try:
-        response = requests.get(url)
-
-        if response.status_code == 200:
-            result = response.json()
-        else:
-            print(f'Error: API request failed with status code {response.status_code}')
-    except requests.RequestException as e:
-        print(f'Error: {e}')
-
-        result = e
-
-    return result
-
-def request_all_congress_members():
-    all_members_fetched = False
-    error = False
-    members = []
-    result = None
-
-    current_url = f'https://{base_url}/member/congress/{current_congress}?limit=250&'
-
-    while not (all_members_fetched or error):
-        try:
-            response = requests.get(f'{current_url}api_key={CONGRESS_GOV_API_KEY}')
-
-            if response.status_code == 200:
-                data = response.json()
-
-                members = members + data['members']
-
-                if 'next' in data['pagination']:
-                    current_url = data['pagination']['next'].replace('limit=20', 'limit=250') + '&'
-                else:
-                    all_members_fetched = True
-
-                    result = members
+            if isinstance(result, Exception):
+                print(f'Error occurred: {result}')
             else:
-                print(f'Error: API request failed with status code {response.status_code}')
+                data = clean_bill_data(result, types[index])
 
-                break
-        except requests.RequestException as error:
-            print(f'Error: {error}')
+                bill_data.append(data)
 
-            result = error
-
-    return result
+    return {'billData': bill_data}
 
 congress_gov_api = {
-    'request_data': request_data,
-    'request_all_congress_members': request_all_congress_members
+    'request_bill_data': request_bill_data
 }

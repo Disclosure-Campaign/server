@@ -44,5 +44,5 @@ politician_fields = candidate_fields + congress_fields + spreadsheet_fields + cu
 Politician = create_model_class(
     'Politician',
     politician_fields,
-    'candidateId1'
+    'fecId1'
 )
