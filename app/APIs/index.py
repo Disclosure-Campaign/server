@@ -12,12 +12,6 @@ from app.APIs.open_secrets.index import open_secrets_api
 
 from app.helpers import find_politician
 
-
-# api_map = {
-#     'congress_gov': congress_gov_api,
-#     'open_secrets': open_secrets_api
-# }
-
 relevant_years = [2022, 2024]
 
 def request_standard_politician_data(params):
@@ -47,12 +41,13 @@ def request_standard_politician_data(params):
             def add_future(callback, params):
                 info_futures.append(executor.submit(callback, params))
 
+            if bioguide_id:
+                add_future(congress_gov_api['request_bio_data'], [bioguide_id, politician, session])
+                add_future(congress_gov_api['request_bill_data'], [bioguide_id])
+
             if opensecrets_id:
                 add_future(open_secrets_api['request_cand_contrib'], [opensecrets_id, 2024])
                 add_future(open_secrets_api['request_mem_prof'], [opensecrets_id, 2016])
-
-            if bioguide_id:
-                add_future(congress_gov_api['request_bill_data'], [bioguide_id])
 
             info_groups = []
 
@@ -64,7 +59,14 @@ def request_standard_politician_data(params):
                 else:
                     info_groups.append(result)
 
-            data = info_groups
+            data = {}
+
+            for group in info_groups:
+                if group['dataType'] == 'billData':
+                    data['sponsoredLegislation'] = group['data']['sponsoredLegislation']
+                    data['cosponsoredLegislation'] = group['data']['cosponsoredLegislation']
+                else:
+                    data[group['dataType']] = group['data']
 
     return data
 

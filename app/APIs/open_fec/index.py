@@ -59,8 +59,6 @@ def request_all_candidates(election_year):
             if response.status_code == 200:
                 data = response.json()
 
-                print(data['pagination'])
-
                 candidates = candidates + data['results']
                 count = len(candidates)
 

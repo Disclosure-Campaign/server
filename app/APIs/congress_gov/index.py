@@ -1,22 +1,49 @@
 import requests
-from app.config import get_config
+from datetime import datetime, timedelta
 
 from concurrent.futures import ThreadPoolExecutor
 import concurrent.futures
 
-from .cleaners import clean_bill_data
+from app.config import get_config
+from app.helpers import object_as_dict
+from .cleaners import clean_bill_data, add_member_data
 
 config = get_config()
 
 CONGRESS_GOV_API_KEY = config.CONGRESS_GOV_API_KEY
 
-data_type_map = {
-    'congressMembers': 'member'
-}
-
 base_url = 'api.congress.gov/v3'
 
 current_congress = 118
+
+def request_bio_data(params):
+    bioguide_id = params[0]
+    politician = params[1]
+    session = params[2]
+
+    last_updated_date = politician.lastUpdated
+    is_recent = last_updated_date and (datetime.now() - last_updated_date) <= timedelta(days=7)
+
+    if not getattr(politician, 'currentTitle', None) or not is_recent:
+        url = f'https://{base_url}/member/{bioguide_id}?api_key={CONGRESS_GOV_API_KEY}'
+
+        try:
+            response = requests.get(url)
+
+            if response.status_code == 200:
+                member_data = response.json()['member']
+
+                add_member_data(politician, member_data)
+
+                session.commit()
+
+                print(politician)
+            else:
+                print(f'Error: API request failed with status code {response.status_code}')
+        except requests.RequestException as e:
+            print(f'Error: {e}')
+
+    return {'dataType': 'bio', 'data': object_as_dict(politician)}
 
 def request_bill_data(params):
     bioguideId = params[0]
@@ -24,29 +51,30 @@ def request_bill_data(params):
     url = f'https://{base_url}/member/'
 
     with ThreadPoolExecutor() as executor:
-        bill_futures = [
-            executor.submit(requests.get, bill_url)
-            for bill_url in [
-                f'{url}{bioguideId}/{method}?limit=250&api_key={CONGRESS_GOV_API_KEY}'
-                for method in ['sponsored-legislation', 'cosponsored-legislation']
-            ]
-        ]
+        methods = ['sponsored-legislation', 'cosponsored-legislation']
 
-        bill_data = []
-        types = ['sponsoredLegislation', 'cosponsoredLegislation']
+        future_to_type = {
+            executor.submit(requests.get, f'{url}{bioguideId}/{method}?limit=250&api_key={CONGRESS_GOV_API_KEY}'): method
+            for method in methods
+        }
 
-        for index, future in enumerate(concurrent.futures.as_completed(bill_futures)):
-            result = future.result().json()
+        bill_data = {}
 
-            if isinstance(result, Exception):
-                print(f'Error occurred: {result}')
-            else:
-                data = clean_bill_data(result, types[index])
+        for index, future in enumerate(concurrent.futures.as_completed(future_to_type)):
+            method = future_to_type[future]
 
-                bill_data.append(data)
+            try:
+                result = future.result().json()
+                data_type = 'sponsoredLegislation' if method == 'sponsored-legislation' else 'cosponsoredLegislation'
 
-    return {'billData': bill_data}
+                cleaned_data = clean_bill_data(result, data_type)
+                bill_data[data_type] = cleaned_data
+            except Exception as e:
+                print(f'Error occurred while processing {method}: {e}')
+
+    return {'dataType': 'billData', 'data': bill_data}
 
 congress_gov_api = {
-    'request_bill_data': request_bill_data
+    'request_bill_data': request_bill_data,
+    'request_bio_data': request_bio_data
 }

@@ -15,7 +15,6 @@ def clean_cand_contrib_data(data):
 
     return cleaned_contributors
 
-
 def parse_member_profile(root):
     profile_data = {
         'name': root.find('member_profile').attrib.get('name', ''),

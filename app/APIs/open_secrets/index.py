@@ -2,7 +2,7 @@ import requests
 import xml.etree.ElementTree as ET
 
 from app.config import get_config
-from .cleaners import clean_cand_contrib_data
+from .cleaners import clean_cand_contrib_data, parse_member_profile
 
 config = get_config()
 
@@ -20,7 +20,6 @@ def request_legislators(state):
     url = f'https://{base_url}/?method=getLegislators&output=json&id={state}&apikey={OPEN_SECRETS_API_KEY}'
 
     try:
-        print(url)
         response = requests.get(url)
 
         if response.status_code == 200:
@@ -56,7 +55,7 @@ def request_cand_contrib(params):
 
         result = e
 
-    return {'cand_contrib': result}
+    return {'dataType': 'candContrib', 'data': result}
 
 def request_mem_prof(params):
     id = params[0]
@@ -64,12 +63,13 @@ def request_mem_prof(params):
 
     url = f'https://{base_url}/?method=memPFDprofile&output=xml&cid={id}&year={year}&apikey={OPEN_SECRETS_API_KEY}'
 
+    result = None
+
     try:
         response = requests.get(url)
 
         if response.status_code == 200:
             root = ET.fromstring(response.content)
-            member_data = parse_member_profile(root)
             result = parse_member_profile(root)
         else:
             print(f'Error: API request failed with status code {response.status_code}')
@@ -78,31 +78,10 @@ def request_mem_prof(params):
 
         result = e
 
-    return {'mem_prof': result}
+    return {'dataType': 'memProf', 'data': result}
 
 open_secrets_api = {
     'request_legislators': request_legislators,
     'request_cand_contrib': request_cand_contrib,
     'request_mem_prof': request_mem_prof
 }
-
-def parse_member_profile(root):
-    member_profile = root.find('member_profile')
-
-    member_data = {
-        'data_year': member_profile.get('data_year'),
-        'net_low': member_profile.get('net_low'),
-        'net_high': member_profile.get('net_high'),
-        'positions_held_count': member_profile.get('positions_held_count'),
-        'asset_count': member_profile.get('asset_count'),
-        'asset_low': member_profile.get('asset_low'),
-        'asset_high': member_profile.get('asset_high'),
-        'transaction_count': member_profile.get('transaction_count'),
-        'tx_low': member_profile.get('tx_low'),
-        'tx_high': member_profile.get('tx_high'),
-        'source': member_profile.get('source'),
-        'origin': member_profile.get('origin'),
-        'update_timestamp': member_profile.get('update_timestamp')
-    }
-
-    return member_data

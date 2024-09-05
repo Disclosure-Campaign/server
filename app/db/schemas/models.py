@@ -11,6 +11,7 @@ data_type_map = {
     'shortString': db.String(15),
     'string': db.String(45),
     'longString': db.String(120),
+    'extraLongString': db.String(200),
     'integer': db.Integer,
     'dateTime': db.DateTime
 }

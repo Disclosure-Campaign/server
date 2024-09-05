@@ -2,9 +2,6 @@ import re
 import pandas as pd
 from datetime import datetime
 
-import sys
-print(sys.path)
-
 from app.db.session import get_session
 from app.db.schemas.models import Politician
 from app.helpers import split_name, construct_name, find_politician
@@ -84,7 +81,14 @@ def update_politicians_from_xls(xls_path):
     start_row = 13
     start_col = 'B'
 
-    excel_data = pd.read_excel(xls_path, sheet_name=sheets_to_process, skiprows=start_row, usecols=start_col + ':ZZ')
+    df = pd.read_excel(xls_path, sheet_name=sheets_to_process, skiprows=start_row)
+
+    num_cols = df[sheets_to_process[0]].shape[1]
+    last_col_letter = chr(ord(start_col) + num_cols - 1)
+
+    usecols_range = f'{start_col}:{last_col_letter}'
+
+    excel_data = pd.read_excel(xls_path, sheet_name=sheets_to_process, skiprows=start_row, usecols=usecols_range)
 
     for sheet_name, data in excel_data.items():
         print(f'Ingesting sheet: {sheet_name}')
@@ -125,5 +129,5 @@ def update_politicians_from_xls(xls_path):
 
         session.commit()
 
-# update_politicians_from_txt('app/db/bulk_data/cn.txt')
+update_politicians_from_txt('app/db/bulk_data/cn.txt')
 update_politicians_from_xls('app/db/static_data/CRP_IDS.xls')

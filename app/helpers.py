@@ -1,8 +1,50 @@
+from flask import current_app, jsonify
+import hashlib
+import json
 import re
+
 from sqlalchemy import or_
+from sqlalchemy.inspection import inspect
+
 from fuzzywuzzy import fuzz
 
+from app.cache import cache
 from app.db.schemas.models import Politician
+
+ignore_cache = False
+
+def generate_cache_key(params, route):
+    sorted_params = json.dumps(params, sort_keys=True)
+
+    hashed_params = hashlib.md5(sorted_params.encode('utf-8')).hexdigest()
+
+    return f'{route}-{hashed_params}'
+
+def check_cache(cache_key):
+    result = None
+    cached_data = cache.get(cache_key)
+
+    if cached_data:
+        current_app.logger.info(f'Cache hit for key: {cache_key}')
+
+        result = cached_data
+
+    return result
+
+def use_cache(callback, params, key):
+    cache_key = generate_cache_key(params, key)
+    cache_data = check_cache(cache_key)
+
+    if (cache_data is not None) and (ignore_cache is False):
+        print('using cache')
+
+        result = cache_data
+    else:
+        result = callback(params)
+
+        cache.set(cache_key, result, timeout=60*60*24)
+
+    return result
 
 def split_name(raw_name):
     titles = ['Dr', 'Sr', 'Jr', 'Mr', 'Mrs', 'Iii']
@@ -79,73 +121,8 @@ def find_politician(session, ids):
 
     return politician
 
+def object_as_dict(obj):
+    return {c.key: getattr(obj, c.key) for c in inspect(obj).mapper.column_attrs}
+
 def fuzzy_match(name1, name2, threshold=80):
     return fuzz.token_sort_ratio(name1, name2) >= threshold
-
-
-
-# def stitch(candidates, congress_members):
-#     candidate_count = len(candidates)
-#     unmatched_congress_member_count = len(congress_members)
-
-#     members_by_name = {
-#         normalize_name(member['name']): member for member in congress_members
-#     }
-
-#     politicians = []
-#     index = 0
-
-#     while index < candidate_count:
-#         candidate = candidates[index]
-#         politician = add_candidate_fields(candidate)
-
-#         state = states[politician['state']]
-
-#         if politician['incumbent_challenge'] == 'I':
-#             candidate_name = politician['label']
-#             _match = None
-
-#             if candidate_name in members_by_name:
-#                 _match = members_by_name[candidate_name]
-#             else:
-#                 for name in members_by_name.keys():
-#                     if fuzzy_match(candidate_name, name):
-#                         print(f'{candidate_name} matched with {name}')
-#                         if members_by_name[name]['state'] == state:
-#                             _match = members_by_name[name]
-
-#                             break
-#                         else:
-#                             print('incorrect state')
-
-#             if _match is not None:
-#                 politician = politician | _match
-#                 unmatched_congress_member_count -= 1
-#             else:
-#                 print('unmatched:')
-#                 print(politician)
-
-#         politicians.append(politician)
-#         index += 1
-
-#     print(f'unmatched congress members: {unmatched_congress_member_count}')
-
-#     return politicians
-
-# def combine_lists(list1, list2, key):
-#     combined_list = []
-#     seen_ids = set()
-
-#     print(f'1: {len(list1)}')
-#     print(f'2: {len(list2)}')
-
-#     for item in list1 + list2:
-#         if item[key] not in seen_ids:
-#             combined_list.append(item)
-#             seen_ids.add(item[key])
-#         else:
-#             print(item)
-
-#     print(f'3: {len(combined_list)}')
-
-#     return combined_list
