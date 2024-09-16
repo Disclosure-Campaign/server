@@ -11,21 +11,12 @@ data_type_map = {
 
 base_url = 'api.propublica.org/campaign-finance/v1'
 
-def request_standard_data(params):
+def request_politician_data(params):
     result = None
-    data_type = data_type_map[params['data_type']]
     name = params['name']
     year = params['year']
 
-    url = f'https://{base_url}/{year}/{name}'
-
-    # if data_type == 'member':
-    #     if 'bio_id' in params:
-    #         bio_id = params['bio_id']
-
-    #         url += f'/{bio_id}'
-
-    url += f'?api_key={PROPUBLICA_API_KEY}'
+    url = f'https://{base_url}/{year}/{name}?api_key={PROPUBLICA_API_KEY}'
 
     try:
         response = requests.get(url)
@@ -42,7 +33,6 @@ def request_standard_data(params):
     return result
 
 
-
 congress_gov_api = {
-    'request_standard_data': request_standard_data
+    'request_politician_data': request_politician_data
 }

@@ -1,10 +1,7 @@
-from flask import jsonify
-from sqlalchemy import asc
 from concurrent.futures import ThreadPoolExecutor
 import concurrent.futures
 
 from app.db.session import get_session
-from app.db.schemas.models import Politician
 
 from app.APIs.congress_gov.index import congress_gov_api
 from app.APIs.open_fec.index import open_fec_api
@@ -70,36 +67,15 @@ def request_standard_politician_data(params):
 
     return data
 
-def request_searchable_entities():
-    session = get_session()
+def request_standard_data(params):
+    data = None
 
-    politicians = session.query(Politician).order_by(asc(Politician.lastName)).all()
+    if params['data_type'] == 'bill':
+        data = congress_gov_api['request_individual_bill_data'](params)
 
-    field_list = [
-        'fullName',
-        'lastName',
-        'bioguideId',
-        'fecId1',
-        'fecId2',
-        'fecId3'
-    ]
-
-    sortedPoliticians = []
-    keyedPoliticians = {}
-
-    for _politician in politicians:
-        politician = {field: getattr(_politician, field) for field in field_list}
-        politician['type'] = 'politician'
-
-        sortedPoliticians.append(politician)
-        keyedPoliticians[politician['fecId1']] = politician
-
-    return jsonify({
-        'sortedPoliticians': sortedPoliticians,
-        'keyedPoliticians': keyedPoliticians
-    })
+    return data
 
 APIs = {
     'request_standard_politician_data': request_standard_politician_data,
-    'request_searchable_entities': request_searchable_entities
+    'request_standard_data': request_standard_data
 }

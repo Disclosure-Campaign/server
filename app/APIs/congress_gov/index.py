@@ -36,8 +36,6 @@ def request_bio_data(params):
                 add_member_data(politician, member_data)
 
                 session.commit()
-
-                print(politician)
             else:
                 print(f'Error: API request failed with status code {response.status_code}')
         except requests.RequestException as e:
@@ -74,7 +72,37 @@ def request_bill_data(params):
 
     return {'dataType': 'billData', 'data': bill_data}
 
+def request_individual_bill_data(params):
+    congress, type, id = params['congress'], params['type'], params['id']
+
+    url = f'https://{base_url}/bill/{congress}/{type}/{id}'
+
+    with ThreadPoolExecutor() as executor:
+        methods = ['', '/summaries', ]
+
+        future_to_type = {
+            executor.submit(requests.get, f'{url}/{method}?limit=250&api_key={CONGRESS_GOV_API_KEY}'): method
+            for method in methods
+        }
+
+        bill_data = {}
+
+        for index, future in enumerate(concurrent.futures.as_completed(future_to_type)):
+            method = future_to_type[future]
+
+            try:
+                result = future.result().json()
+                data_type = 'summaries' if method == '/summaries' else 'bill'
+
+                bill_data[data_type] = result[data_type]
+            except Exception as e:
+                print(f'Error occurred while processing {method}: {e}')
+
+    return bill_data
+
+
 congress_gov_api = {
+    'request_bio_data': request_bio_data,
     'request_bill_data': request_bill_data,
-    'request_bio_data': request_bio_data
+    'request_individual_bill_data': request_individual_bill_data
 }
