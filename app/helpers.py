@@ -1,4 +1,4 @@
-from flask import current_app, jsonify
+from flask import current_app
 import hashlib
 import json
 import re
@@ -13,12 +13,12 @@ from app.db.schemas.models import Politician
 
 ignore_cache = False
 
-def generate_cache_key(params, route):
+def generate_cache_key(params, key):
     sorted_params = json.dumps(params, sort_keys=True)
 
     hashed_params = hashlib.md5(sorted_params.encode('utf-8')).hexdigest()
 
-    return f'{route}-{hashed_params}'
+    return f'{key}-{hashed_params}'
 
 def check_cache(cache_key):
     result = None
@@ -124,5 +124,5 @@ def find_politician(session, ids):
 def object_as_dict(obj):
     return {c.key: getattr(obj, c.key) for c in inspect(obj).mapper.column_attrs}
 
-def fuzzy_match(name1, name2, threshold=80):
-    return fuzz.token_sort_ratio(name1, name2) >= threshold
+def fuzzy_match(name1, name2):
+    return fuzz.token_sort_ratio(name1, name2)

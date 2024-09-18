@@ -40,7 +40,7 @@ def request_standard_politician_data(params):
 
             if bioguide_id:
                 add_future(congress_gov_api['request_bio_data'], [bioguide_id, politician, session])
-                add_future(congress_gov_api['request_bill_data'], [bioguide_id])
+                add_future(congress_gov_api['request_bills_data'], [bioguide_id])
 
             if opensecrets_id:
                 add_future(open_secrets_api['request_cand_contrib'], [opensecrets_id, 2024])
@@ -70,8 +70,10 @@ def request_standard_politician_data(params):
 def request_standard_data(params):
     data = None
 
-    if params['data_type'] == 'bill':
-        data = congress_gov_api['request_individual_bill_data'](params)
+    if params['entity_type'] == 'bill':
+        data = congress_gov_api['request_bill_data'](params)
+    elif params['entity_type'] == 'org':
+        data = open_secrets_api['request_org_data'](params)
 
     return data
 

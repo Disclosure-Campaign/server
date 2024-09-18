@@ -13,30 +13,18 @@ def get_searchable_entities():
 
     return result
 
-@bp.route('/request_politician_data')
+@bp.route('/request_standard_data')
 
-def request_politician_data():
+def request_standard_data():
     params = request.args.to_dict()
     result = False
 
-    result = use_cache(APIs['request_standard_politician_data'], params, 'rspd')
+    entity_type = params['entity_type']
 
-    if not result:
-        result = jsonify({"error": "Failed to retrieve data from the API"}), 500
+    if entity_type == 'politician':
+        result = use_cache(APIs['request_standard_politician_data'], params, entity_type)
     else:
-        result = jsonify(result)
-
-    return result
-
-@bp.route('/request_bill_data')
-
-def request_bill_data():
-    params = request.args.to_dict()
-    result = False
-
-    params['data_type'] = 'bill'
-
-    result = use_cache(APIs['request_standard_data'], params, 'bill')
+        result = use_cache(APIs['request_standard_data'], params, entity_type)
 
     if not result:
         result = jsonify({"error": "Failed to retrieve data from the API"}), 500

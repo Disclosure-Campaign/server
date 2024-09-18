@@ -43,7 +43,7 @@ def request_bio_data(params):
 
     return {'dataType': 'bio', 'data': object_as_dict(politician)}
 
-def request_bill_data(params):
+def request_bills_data(params):
     bioguideId = params[0]
 
     url = f'https://{base_url}/member/'
@@ -72,7 +72,7 @@ def request_bill_data(params):
 
     return {'dataType': 'billData', 'data': bill_data}
 
-def request_individual_bill_data(params):
+def request_bill_data(params):
     congress, type, id = params['congress'], params['type'], params['id']
 
     url = f'https://{base_url}/bill/{congress}/{type}/{id}'
@@ -103,6 +103,6 @@ def request_individual_bill_data(params):
 
 congress_gov_api = {
     'request_bio_data': request_bio_data,
-    'request_bill_data': request_bill_data,
-    'request_individual_bill_data': request_individual_bill_data
+    'request_bills_data': request_bills_data,
+    'request_bill_data': request_bill_data
 }
