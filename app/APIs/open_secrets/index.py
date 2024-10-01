@@ -14,7 +14,9 @@ generic = [
     'llc',
     'ventures',
     'trading',
-    'industry'
+    'industry',
+    'coalition',
+    'campaign'
 ]
 
 config = get_config()
@@ -119,7 +121,7 @@ def find_org_id(org_slug):
 
     with ThreadPoolExecutor() as executor:
         org_name_parts = org_slug.split('-')
-        cleaned_org_name_parts = [part for part in org_name_parts if part.to_lower() not in generic]
+        cleaned_org_name_parts = [part for part in org_name_parts if part.lower() not in generic]
         org_futures = []
         possible_orgs = []
 
@@ -138,7 +140,7 @@ def find_org_id(org_slug):
                 for _org in result.json()['response']['organization']:
                     org = _org['@attributes']
 
-                    if org['orgname'] == org_name:
+                    if org['orgname'].lower() == org_name:
                         return org['orgid']
                     else:
                         org['score'] = fuzzy_match(org['orgname'], org_name)
@@ -149,8 +151,11 @@ def find_org_id(org_slug):
     best_org = possible_orgs[0]
 
     for org in possible_orgs[1:]:
-        if org['score'] > best_score:
+        score = org['score']
+
+        if score > best_score:
             best_org = org
+            best_score = score
 
     return best_org['orgid']
 

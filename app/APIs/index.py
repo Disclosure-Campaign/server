@@ -38,11 +38,11 @@ def request_standard_politician_data(params):
             def add_future(callback, params):
                 info_futures.append(executor.submit(callback, params))
 
-            if bioguide_id:
+            if bioguide_id is not None:
                 add_future(congress_gov_api['request_bio_data'], [bioguide_id, politician, session])
                 add_future(congress_gov_api['request_bills_data'], [bioguide_id])
 
-            if opensecrets_id:
+            if opensecrets_id is not None:
                 add_future(open_secrets_api['request_cand_contrib'], [opensecrets_id, 2024])
                 add_future(open_secrets_api['request_mem_prof'], [opensecrets_id, 2016])
 

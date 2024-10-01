@@ -2,7 +2,7 @@ from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.declarative import as_declarative, declared_attr
 
-from .bulk_data_schema import candidate_fields, spreadsheet_fields
+from .bulk_data_schema import candidate_fields, spreadsheet_fields, zip_fields
 from .api_data_schema import congress_fields
 
 db = SQLAlchemy()
@@ -22,7 +22,7 @@ class Base:
     def __tablename__(cls):
         return cls.__name__.lower()
 
-def create_model_class(class_name, fields, primary_key):
+def create_model_class(class_name, fields, primary_key, include_update):
     class_attrs = {'__tablename__': class_name.lower()}
 
     for field in fields:
@@ -34,16 +34,25 @@ def create_model_class(class_name, fields, primary_key):
         else:
             class_attrs[key] = db.Column(data_type)
 
-        class_attrs['lastUpdated'] = db.Column(db.DateTime, default=datetime.now())
+        if include_update:
+            class_attrs['lastUpdated'] = db.Column(db.DateTime, default=datetime.now())
 
     return type(class_name, (Base,), class_attrs)
 
-custom_fields =[]
+custom_fields = []
 
 politician_fields = candidate_fields + congress_fields + spreadsheet_fields + custom_fields
 
 Politician = create_model_class(
     'Politician',
     politician_fields,
-    'fecId1'
+    'fecId1',
+    True
+)
+
+Zip = create_model_class(
+    'Zip',
+    zip_fields,
+    'fullZip',
+    False
 )

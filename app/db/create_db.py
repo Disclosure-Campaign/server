@@ -1,11 +1,12 @@
 import os
+import math
 import pandas as pd
 from dotenv import load_dotenv
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from app.db.schemas.models import Base, Politician
+from app.db.schemas.models import Base, Politician, Zip
 
 load_dotenv()
 
@@ -19,7 +20,7 @@ session = Session()
 def create_tables():
     Base.metadata.create_all(engine)
 
-def insert_data(data):
+def insert_legislator_data(data):
     for _, row in data.iterrows():
         column_values = {
             'firstName': row['first_name'],
@@ -54,11 +55,9 @@ def insert_data(data):
 
     session.commit()
 
-numeric_columns = ['district']
-date_columns = ['birthday']
-
-def main():
-    create_tables()
+def fill_legislators():
+    numeric_columns = ['district']
+    date_columns = ['birthday']
 
     df = pd.read_csv('app/db/static_data/legislators_current.csv')
 
@@ -74,7 +73,36 @@ def main():
 
     df.fillna(value=fill_values, inplace=True)
 
-    insert_data(df)
+    insert_legislator_data(df)
+
+def fill_districts():
+    df = pd.read_csv('app/db/static_data/zccd.csv')
+
+    for _, row in df.iterrows():
+        district = str(int(row['cd'])).rjust(2, '0')
+        zip = str(int(row['zcta'])).rjust(5, '0')
+        state = row['state_abbr']
+
+        fullZip = f'{state}-{zip}-{district}'
+
+        zip_code_district = Zip(
+            fullZip=fullZip,
+            zip=zip,
+            district=district,
+            state=state
+        )
+
+        session.add(zip_code_district)
+
+    session.commit()
+
+
+def main():
+    create_tables()
+
+    fill_legislators()
+    fill_districts()
+
 
 if __name__ == '__main__':
     main()

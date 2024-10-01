@@ -1,5 +1,7 @@
 # www.fec.gov/campaign-finance-data/candidate-master-file-description
 
+# politician
+
 candidate_fields = [
   {'key': 'fecId1', 'data_type': 'shortString'},
   {'key': 'fecId2', 'data_type': 'shortString'},
@@ -28,4 +30,13 @@ spreadsheet_fields = [
   {'key': 'contactForm', 'data_type': 'longString'},
   {'key': 'twitter', 'data_type': 'longString'},
   {'key': 'facebook', 'data_type': 'longString'}
+]
+
+# zip
+
+zip_fields = [
+  {'key': 'fullZip', 'data_type': 'shortString'},
+  {'key': 'zip', 'data_type': 'shortString'},
+  {'key': 'district', 'data_type': 'shortString'},
+  {'key': 'state', 'data_type': 'shortString'}
 ]
