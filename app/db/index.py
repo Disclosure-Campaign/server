@@ -14,12 +14,13 @@ def request_searchable_entities():
         'lastName',
         'bioguideId',
         'fecId1',
-        'fecId2',
-        'fecId3',
+        'currentTitle',
         'party',
         'candidateOfficeState',
         'candidateOfficeDistrict',
-        'candidateZip'
+        'candidateZip',
+        'depictionImageUrl',
+        'candidateOffice'
     ]
 
     sortedPoliticians = []
@@ -33,6 +34,8 @@ def request_searchable_entities():
         keyedPoliticians[politician['fecId1']] = politician
 
     zips = session.query(Zip).all()
+
+    session.close()
 
     zip_field_list = ['zip', 'district', 'state']
 

@@ -29,8 +29,8 @@ def request_standard_politician_data(params):
         for field in ['fecId1', 'fecId2', 'fecId3']:
             id = getattr(politician, field, None)
 
-        if id:
-            fec_ids.append(id)
+            if id is not None:
+                fec_ids.append(id)
 
         with ThreadPoolExecutor() as executor:
             info_futures = []
@@ -53,6 +53,10 @@ def request_standard_politician_data(params):
 
                 if isinstance(result, Exception):
                     print(f'Error occurred: {result}')
+                elif result['data'] is None:
+                    data_type = result['dataType']
+
+                    print(f'{data_type} data unavailable')
                 else:
                     info_groups.append(result)
 
@@ -64,6 +68,8 @@ def request_standard_politician_data(params):
                     data['cosponsoredLegislation'] = group['data']['cosponsoredLegislation']
                 else:
                     data[group['dataType']] = group['data']
+
+            session.close()
 
     return data
 

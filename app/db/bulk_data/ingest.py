@@ -7,9 +7,7 @@ from app.db.schemas.models import Politician
 from app.helpers import split_name, construct_name, find_politician
 from app.db.static_data.party_codes import party_codes
 
-def update_politicians_from_txt(txt_path):
-    session = get_session()
-
+def update_politicians_from_txt(txt_path, session):
     with open(txt_path, 'r') as file:
         for line in file:
             row = line.strip().split('|')
@@ -55,13 +53,7 @@ def update_politicians_from_txt(txt_path):
                 politician = Politician(**column_values)
                 session.add(politician)
 
-    session.commit()
-
-    print('Database update complete.')
-
-def update_politicians_from_xls(xls_path):
-    session = get_session()
-
+def update_politicians_from_xls(xls_path, session):
     party_map = {
         'D': 'Democratic Party',
         'L': 'Libertarian Party',
@@ -127,7 +119,16 @@ def update_politicians_from_xls(xls_path):
                 politician = Politician(**column_values)
                 session.add(politician)
 
-        session.commit()
+def ingest():
+    session = get_session()
 
-update_politicians_from_txt('app/db/bulk_data/cn.txt')
-update_politicians_from_xls('app/db/static_data/CRP_IDS.xls')
+    update_politicians_from_txt('app/db/bulk_data/cn.txt', session)
+    update_politicians_from_xls('app/db/static_data/CRP_IDS.xls', session)
+
+    print('Database update complete.')
+
+    session.commit()
+    session.close()
+
+
+ingest()

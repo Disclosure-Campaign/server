@@ -26,7 +26,7 @@ def request_standard_data():
     else:
         result = use_cache(APIs['request_standard_data'], params, entity_type)
 
-    if not result:
+    if result is None:
         result = jsonify({"error": "Failed to retrieve data from the API"}), 500
     else:
         result = jsonify(result)

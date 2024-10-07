@@ -1,5 +1,4 @@
 import os
-import math
 import pandas as pd
 from dotenv import load_dotenv
 
@@ -15,12 +14,11 @@ DATABASE_URL = os.getenv('DATABASE_URL')
 engine = create_engine(DATABASE_URL)
 
 Session = sessionmaker(bind=engine)
-session = Session()
 
 def create_tables():
     Base.metadata.create_all(engine)
 
-def insert_legislator_data(data):
+def insert_legislator_data(data, session):
     for _, row in data.iterrows():
         column_values = {
             'firstName': row['first_name'],
@@ -55,7 +53,7 @@ def insert_legislator_data(data):
 
     session.commit()
 
-def fill_legislators():
+def fill_legislators(session):
     numeric_columns = ['district']
     date_columns = ['birthday']
 
@@ -73,9 +71,9 @@ def fill_legislators():
 
     df.fillna(value=fill_values, inplace=True)
 
-    insert_legislator_data(df)
+    insert_legislator_data(df, session)
 
-def fill_districts():
+def fill_districts(session):
     df = pd.read_csv('app/db/static_data/zccd.csv')
 
     for _, row in df.iterrows():
@@ -98,10 +96,13 @@ def fill_districts():
 
 
 def main():
+    session = Session()
+
     create_tables()
 
-    fill_legislators()
-    fill_districts()
+    fill_legislators(session)
+    fill_districts(session)
+    add_presidential_data(session)
 
 
 if __name__ == '__main__':

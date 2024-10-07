@@ -21,6 +21,8 @@ def request_bio_data(params):
     politician = params[1]
     session = params[2]
 
+    result = None
+
     last_updated_date = politician.lastUpdated
     is_recent = last_updated_date and (datetime.now() - last_updated_date) <= timedelta(days=7)
 
@@ -36,12 +38,17 @@ def request_bio_data(params):
                 add_member_data(politician, member_data)
 
                 session.commit()
+
+                result = object_as_dict(politician)
             else:
-                print(f'Error: API request failed with status code {response.status_code}')
+                print(f'Error: bio API request failed with status code {response.status_code}')
+
         except requests.RequestException as e:
             print(f'Error: {e}')
+    else:
+        result = object_as_dict(politician)
 
-    return {'dataType': 'bio', 'data': object_as_dict(politician)}
+    return {'dataType': 'bio', 'data': result}
 
 def request_bills_data(params):
     bioguideId = params[0]
@@ -69,6 +76,8 @@ def request_bills_data(params):
                 bill_data[data_type] = cleaned_data
             except Exception as e:
                 print(f'Error occurred while processing {method}: {e}')
+
+                bill_data = None
 
     return {'dataType': 'billData', 'data': bill_data}
 

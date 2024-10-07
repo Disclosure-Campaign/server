@@ -36,11 +36,9 @@ def request_legislators(state):
         if response.status_code == 200:
             result = response.json()
         else:
-            print(f'Error: API request failed with status code {response.status_code}')
+            print(f'Error: legislator API request failed with status code {response.status_code}')
     except requests.RequestException as e:
         print(f'Error: {e}')
-
-        result = e
 
     return result
 
@@ -60,11 +58,9 @@ def request_cand_contrib(params):
 
             result = clean_cand_contrib_data(raw_data)
         else:
-            print(f'Error: API request failed with status code {response.status_code}')
+            print(f'Error: contrib API request failed with status code {response.status_code}')
     except requests.RequestException as e:
         print(f'Error: {e}')
-
-        result = e
 
     return {'dataType': 'candContrib', 'data': result}
 
@@ -83,11 +79,9 @@ def request_mem_prof(params):
             root = ET.fromstring(response.content)
             result = parse_member_profile(root)
         else:
-            print(f'Error: API request failed with status code {response.status_code}')
+            print(f'Error: mem prof API request failed with status code {response.status_code}')
     except requests.RequestException as e:
         print(f'Error: {e}')
-
-        result = e
 
     return {'dataType': 'memProf', 'data': result}
 
