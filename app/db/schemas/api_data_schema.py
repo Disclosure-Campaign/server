@@ -10,6 +10,5 @@ congress_fields = [
   {'key': 'state', 'data_type': 'shortString'},
   {'key': 'party', 'data_type': 'string'},
 
-  {'key': 'currentTitle', 'data_type': 'string'},
-  {'key': 'runningFor', 'data_type': 'string'}
+  {'key': 'currentTitle', 'data_type': 'string'}
 ]

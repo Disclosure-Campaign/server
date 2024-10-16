@@ -104,8 +104,6 @@ def request_org_data(params):
     except requests.RequestException as e:
         print(f'Error: {e}')
 
-        result = e
-
     return {'org': result}
 
 def find_org_id(org_slug):

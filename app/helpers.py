@@ -107,7 +107,7 @@ def add_candidate_fields(input_politician):
 
 
 def find_politician(session, ids):
-    fec_id = ids.get('fecId', 'N/A')
+    fec_id = ids.get('fecId1', 'N/A')
     opensecrets_id = ids.get('opensecretsId', 'N/A')
 
     politician = session.query(Politician).filter(

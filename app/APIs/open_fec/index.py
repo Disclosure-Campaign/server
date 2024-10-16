@@ -42,6 +42,5 @@ def request_politician_data(params):
     return result
 
 open_fec_api = {
-    'request_politician_data': request_politician_data,
-    'request_all_candidates': request_all_candidates
+    'request_politician_data': request_politician_data
 }

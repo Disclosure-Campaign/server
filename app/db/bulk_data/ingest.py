@@ -4,6 +4,7 @@ from datetime import datetime
 
 from app.db.session import get_session
 from app.db.schemas.models import Politician
+from app.db.custom.add_presidential_data import add_presidential_data
 from app.helpers import split_name, construct_name, find_politician
 from app.db.static_data.party_codes import party_codes
 
@@ -19,6 +20,10 @@ def update_politicians_from_txt(txt_path, session):
                 print(f'Skipping row with name containing a number: {fullName}')
                 continue
 
+            state = row[4]
+            office = row[5]
+            district = str(int(row[6])).rjust(2, '0')
+
             column_values = {
                 'fullName': fullName,
                 'lastName': parts[0],
@@ -26,9 +31,9 @@ def update_politicians_from_txt(txt_path, session):
                 'middleName': parts[2],
                 'party': 'Unknown party' if row[2] not in party_codes else party_codes[row[2]],
                 'candidateElectionYear': row[3],
-                'candidateOfficeState': row[4],
-                'candidateOffice': row[5],
-                'candidateOfficeDistrict': row[6],
+                'candidateOfficeState': state,
+                'candidateOffice': office,
+                'candidateOfficeDistrict': district,
                 'candidateIncumbent': row[7],
                 'candidateStatus': row[8],
                 'candidateStreet1': row[10],
@@ -36,12 +41,12 @@ def update_politicians_from_txt(txt_path, session):
                 'candidateCity': row[12],
                 'candidateState': row[13],
                 'candidateZip': row[14] if row[14] != '' else 0,
-                'lastUpdated': datetime.now(),
+                'lastUpdated': datetime.now()
             }
 
             fec_id = row[0]
 
-            existing_politician = find_politician(session, {'fecId': fec_id})
+            existing_politician = find_politician(session, {'fecId1': fec_id})
 
             if existing_politician:
                 for key, value in column_values.items():
@@ -50,8 +55,14 @@ def update_politicians_from_txt(txt_path, session):
             else:
                 column_values['fecId1'] = fec_id
 
+                currentTitle = 'Candidate for '
+
+                currentTitle += f'{state} Senator' if office == 'sen' else f'House Rep (District {district})'
+
                 politician = Politician(**column_values)
                 session.add(politician)
+
+    session.commit()
 
 def update_politicians_from_xls(xls_path, session):
     party_map = {
@@ -106,7 +117,7 @@ def update_politicians_from_xls(xls_path, session):
 
             existing_politician = find_politician(
                 session,
-                {'fecId': fecId, 'opensecretsId': opensecretsId}
+                {'fecId1': fecId, 'opensecretsId': opensecretsId}
             )
 
             if existing_politician:
@@ -119,16 +130,17 @@ def update_politicians_from_xls(xls_path, session):
                 politician = Politician(**column_values)
                 session.add(politician)
 
+    session.commit()
+
 def ingest():
     session = get_session()
 
     update_politicians_from_txt('app/db/bulk_data/cn.txt', session)
     update_politicians_from_xls('app/db/static_data/CRP_IDS.xls', session)
+    add_presidential_data(session)
 
     print('Database update complete.')
 
-    session.commit()
     session.close()
-
 
 ingest()

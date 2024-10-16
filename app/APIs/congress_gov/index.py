@@ -19,14 +19,20 @@ current_congress = 118
 def request_bio_data(params):
     bioguide_id = params[0]
     politician = params[1]
-    session = params[2]
 
     result = None
 
     last_updated_date = politician.lastUpdated
     is_recent = last_updated_date and (datetime.now() - last_updated_date) <= timedelta(days=7)
 
-    if not getattr(politician, 'currentTitle', None) or not is_recent:
+    has_atributes = True
+
+    for attribute in ['currentTitle', 'depictionImageUrl']:
+        if getattr(politician, attribute, None):
+            has_atributes = False
+            break
+
+    if not has_atributes or not is_recent:
         url = f'https://{base_url}/member/{bioguide_id}?api_key={CONGRESS_GOV_API_KEY}'
 
         try:
@@ -36,8 +42,6 @@ def request_bio_data(params):
                 member_data = response.json()['member']
 
                 add_member_data(politician, member_data)
-
-                session.commit()
 
                 result = object_as_dict(politician)
             else:

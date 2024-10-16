@@ -21,7 +21,7 @@ class DevelopmentConfig(Config):
     CACHE_TYPE = 'simple'
 
 class ProductionConfig(Config):
-    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')  # Heroku sets this automatically
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
 
     CACHE_TYPE = 'redis'
     CACHE_REDIS_HOST = 'localhost'
@@ -31,7 +31,9 @@ class ProductionConfig(Config):
 def get_config():
     env = os.getenv('FLASK_ENV', 'development')
 
-    if env == 'production':
-        return ProductionConfig
+    config = DevelopmentConfig
 
-    return DevelopmentConfig
+    if env == 'production':
+        config = ProductionConfig
+
+    return config

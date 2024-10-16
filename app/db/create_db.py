@@ -20,6 +20,12 @@ def create_tables():
 
 def insert_legislator_data(data, session):
     for _, row in data.iterrows():
+        state = row['state']
+        district = str(int(row['district'])).rjust(2, '0')
+        office = row['type']
+
+        current_title = f'{state} Senator' if office == 'sen' else f'{state} House Rep (District {district})'
+
         column_values = {
             'firstName': row['first_name'],
             'middleName': row['middle_name'],
@@ -27,11 +33,11 @@ def insert_legislator_data(data, session):
             'fullName': row['full_name'],
             'bioguideId': row['bioguide_id'],
             'opensecretsId': row['opensecrets_id'],
-            'state': row['state'],
-            'district': row['district'],
+            'currentTitle': current_title,
+            'state': state,
+            'district': district,
             'party': row['party'],
             'birthday': row['birthday'],
-            'type': row['type'],
             'website': row['url'],
             'phone': row['phone'],
             'contactForm': row['contact_form'],
@@ -73,6 +79,8 @@ def fill_legislators(session):
 
     insert_legislator_data(df, session)
 
+    session.commit()
+
 def fill_districts(session):
     df = pd.read_csv('app/db/static_data/zccd.csv')
 
@@ -94,16 +102,16 @@ def fill_districts(session):
 
     session.commit()
 
-
-def main():
+def create_db():
     session = Session()
 
     create_tables()
 
     fill_legislators(session)
     fill_districts(session)
-    add_presidential_data(session)
 
+    session.close()
 
-if __name__ == '__main__':
-    main()
+    print('Database creation complete.')
+
+create_db()

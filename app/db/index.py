@@ -3,6 +3,7 @@ from sqlalchemy import asc
 
 from app.db.schemas.models import Politician, Zip
 from app.db.session import get_session
+from app.helpers import find_politician, object_as_dict
 
 def request_searchable_entities():
     session = get_session()
@@ -18,9 +19,7 @@ def request_searchable_entities():
         'party',
         'candidateOfficeState',
         'candidateOfficeDistrict',
-        'candidateZip',
-        'depictionImageUrl',
-        'candidateOffice'
+        'depictionImageUrl'
     ]
 
     sortedPoliticians = []
@@ -34,8 +33,6 @@ def request_searchable_entities():
         keyedPoliticians[politician['fecId1']] = politician
 
     zips = session.query(Zip).all()
-
-    session.close()
 
     zip_field_list = ['zip', 'district', 'state']
 
@@ -53,6 +50,9 @@ def request_searchable_entities():
             zipList.append(zip)
             keyedZips[zip_code] = [zip]
 
+    session.commit()
+    session.close()
+
     return jsonify({
         'sortedPoliticians': sortedPoliticians,
         'keyedPoliticians': keyedPoliticians,
@@ -60,6 +60,15 @@ def request_searchable_entities():
         'keyedZips': keyedZips
     })
 
+def get_bio_from_db(params):
+    session = params[0]
+    politician = params[1]
+
+    bio_data = find_politician(session, object_as_dict(politician))
+
+    return {'dataType': 'bio', 'data': object_as_dict(bio_data)}
+
 db_functions = {
-    'request_searchable_entities': request_searchable_entities
+    'request_searchable_entities': request_searchable_entities,
+    'get_bio_from_db': get_bio_from_db
 }
