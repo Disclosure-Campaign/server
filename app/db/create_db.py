@@ -114,4 +114,5 @@ def create_db():
 
     print('Database creation complete.')
 
-create_db()
+if __name__ == 'main':
+    create_db()

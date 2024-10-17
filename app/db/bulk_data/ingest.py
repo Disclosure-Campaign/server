@@ -143,4 +143,5 @@ def ingest():
 
     session.close()
 
-ingest()
+if __name__ == '__main__':
+    ingest()
