@@ -1,4 +1,4 @@
-aiohttp=3.8.1=py39hca72f7f_1
+aiohttp=3.8.1
 aiosignal=1.2.0=pyhd3eb1b0_0
 alabaster=0.7.12=pyhd3eb1b0_0
 alembic=1.13.2=pypi_0
