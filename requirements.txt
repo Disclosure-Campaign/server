@@ -3,9 +3,9 @@ aiosignal==1.2.0
 alabaster==0.7.12
 alembic==1.13.2
 anaconda
-anaconda-client==1.9.0
-anaconda-navigator==2.2.0
-anaconda-project==0.10.2
+anaconda-client
+anaconda-navigator
+anaconda-project
 anyio==3.5.0
 appdirs==1.4.4
 applaunchservices==0.2.1
