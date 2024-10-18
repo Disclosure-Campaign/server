@@ -3,7 +3,7 @@ aiosignal==1.2.0
 alabaster==0.7.12
 alembic==1.13.2
 anaconda==2022.05
-anaconda-client==1.9.0
+anaconda-client==1.2.2
 anaconda-navigator==2.2.0
 anaconda-project==0.10.2
 anyio==3.5.0
