@@ -1,4 +1,5 @@
 # conda list -e > requirements.txt
+# pipreqs .
 
 input_file = open('requirements.txt', mode='r')
 output_file = open('fixed_requirements.txt', 'w')

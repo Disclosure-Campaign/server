@@ -12,7 +12,7 @@ db = SQLAlchemy()
 
 def create_app():
     server = Flask(__name__)
-    CORS(server)
+    CORS(server, resources={r'/*': {'origins': ['https://disclosurecampaign.org']}})
 
     config_class = get_config()
     server.config.from_object(config_class())
