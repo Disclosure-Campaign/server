@@ -9,6 +9,8 @@ from app.helpers import split_name, construct_name, find_politician
 from app.db.static_data.party_codes import party_codes
 
 def update_politicians_from_txt(txt_path, session):
+    print('Updating politicians from Opensecrets...')
+
     with open(txt_path, 'r') as file:
         for line in file:
             row = line.strip().split('|')
@@ -64,7 +66,12 @@ def update_politicians_from_txt(txt_path, session):
 
     session.commit()
 
+    print('Opensecrets politicians update complete.')
+
+
 def update_politicians_from_xls(xls_path, session):
+    print('Updating politician id columns...')
+
     party_map = {
         'D': 'Democratic Party',
         'L': 'Libertarian Party',
@@ -132,14 +139,18 @@ def update_politicians_from_xls(xls_path, session):
 
     session.commit()
 
+    print('Politician id columns complete.')
+
+
 def ingest():
+    print('Starting ingest...')
     session = get_session()
 
     update_politicians_from_txt('app/db/bulk_data/cn.txt', session)
     update_politicians_from_xls('app/db/static_data/CRP_IDS.xls', session)
     add_presidential_data(session)
 
-    print('Database update complete.')
+    print('Ingest complete.')
 
     session.close()
 

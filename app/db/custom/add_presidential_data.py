@@ -38,6 +38,8 @@ shared_attributes = {
 }
 
 def add_presidential_data(session):
+    print('Adding presidential data...')
+
     for attributes in candidate_info_map:
         pres_cand = find_politician(session, {'fecId1': attributes['fecId']})
 
@@ -47,6 +49,8 @@ def add_presidential_data(session):
             setattr(pres_cand, attribute, value)
 
     session.commit()
+
+    print('Added presidential data...')
 
 
 

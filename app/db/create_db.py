@@ -19,6 +19,8 @@ def create_tables():
     Base.metadata.create_all(engine)
 
 def insert_legislator_data(data, session):
+    print('Inserting legislator data...')
+
     for _, row in data.iterrows():
         state = row['state']
         district = str(int(row['district'])).rjust(2, '0')
@@ -59,7 +61,11 @@ def insert_legislator_data(data, session):
 
     session.commit()
 
+    print('Legislator data insertion complete.')
+
 def fill_legislators(session):
+    print('Inserting additional legislator data...')
+
     numeric_columns = ['district']
     date_columns = ['birthday']
 
@@ -80,6 +86,8 @@ def fill_legislators(session):
     insert_legislator_data(df, session)
 
     session.commit()
+
+    print('Additional legislator data insertion complete.')
 
 def fill_districts(session):
     df = pd.read_csv('app/db/static_data/zccd.csv')
@@ -103,6 +111,8 @@ def fill_districts(session):
     session.commit()
 
 def create_db():
+    print('Starting database creation...')
+
     session = Session()
 
     create_tables()

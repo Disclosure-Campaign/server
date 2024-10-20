@@ -10,9 +10,16 @@ migrate = Migrate()
 
 db = SQLAlchemy()
 
+origins = [
+    'https://disclosurecampaign.org',
+    'https://disclosure-campaign-site-6852e977de7d.herokuapp.com'
+]
+
 def create_app():
+    print('Starting server...')
+
     server = Flask(__name__)
-    CORS(server, resources={r'/*': {'origins': ['https://disclosurecampaign.org']}})
+    CORS(server, resources={r'/*': {'origins': origins}})
 
     config_class = get_config()
     server.config.from_object(config_class())
@@ -24,5 +31,7 @@ def create_app():
 
     from app.routes import bp
     server.register_blueprint(bp)
+
+    print('Server started.')
 
     return server
