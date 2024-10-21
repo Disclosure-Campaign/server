@@ -1,2 +1,2 @@
-release: python manage.py create_db && python manage.py ingest
+release: python manage.py create_db_and_ingest
 web: gunicorn run:app --log-file -

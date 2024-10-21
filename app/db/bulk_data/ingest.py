@@ -24,7 +24,10 @@ def update_politicians_from_txt(txt_path, session):
 
             state = row[4]
             office = row[5]
-            district = str(int(row[6])).rjust(2, '0')
+            district = row[6]
+
+            if district != '':
+                district = str(int(district)).rjust(2, '0')
 
             column_values = {
                 'fullName': fullName,
