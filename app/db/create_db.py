@@ -16,8 +16,7 @@ engine = create_engine(DATABASE_URL)
 Session = sessionmaker(bind=engine)
 
 def create_tables():
-    for tbl in reversed(Base.metadata.sorted_tables):
-        engine.execute(tbl.delete())
+    Base.metadata.drop_all(engine)
 
     Base.metadata.create_all(engine)
 
