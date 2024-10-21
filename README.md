@@ -1,6 +1,6 @@
 # server
 Server with connections to APIs
 
-heroku config:set ENV_VAR=
-
 pipreqs .
+
+release: python manage.py create_db_and_ingest

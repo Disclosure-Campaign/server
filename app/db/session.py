@@ -5,7 +5,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DATABASE_URL = os.getenv('DATABASE_URL')
+database_url = 'PROD_DATABASE_URL' if os.getenv('FLASK_ENV') == 'production' else 'DEV_DATABASE_URL'
+
+DATABASE_URL = os.getenv(database_url)
 
 engine = create_engine(DATABASE_URL)
 Session = sessionmaker(bind=engine)

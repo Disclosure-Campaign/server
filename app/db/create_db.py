@@ -3,17 +3,17 @@ import pandas as pd
 from dotenv import load_dotenv
 
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 
+from app.db.session import get_session
 from app.db.schemas.models import Base, Politician, Zip
 
 load_dotenv()
 
-DATABASE_URL = os.getenv('DATABASE_URL')
+database_url = 'PROD_DATABASE_URL' if os.getenv('FLASK_ENV') == 'production' else 'DEV_DATABASE_URL'
+
+DATABASE_URL = os.getenv(database_url)
 
 engine = create_engine(DATABASE_URL)
-
-Session = sessionmaker(bind=engine)
 
 def create_tables():
     Base.metadata.drop_all(engine)
@@ -118,7 +118,7 @@ def fill_districts(session):
 def create_db():
     print('Starting database creation...')
 
-    session = Session()
+    session = get_session()
 
     create_tables()
 
