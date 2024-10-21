@@ -16,12 +16,12 @@ class Config:
 
 class DevelopmentConfig(Config):
     PSQL_PASSWORD = os.getenv('PSQL_PASSWORD')
-    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', f'postgresql://postgres:{PSQL_PASSWORD}@localhost/disclosure_campaign')
+    SQLALCHEMY_DATABASE_URI = os.getenv('DEV_DATABASE_URL', f'postgresql://postgres:{PSQL_PASSWORD}@localhost/disclosure_campaign')
 
     CACHE_TYPE = 'simple'
 
 class ProductionConfig(Config):
-    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
+    SQLALCHEMY_DATABASE_URI = os.getenv('PROD_DATABASE_URL')
 
     CACHE_TYPE = 'redis'
     CACHE_REDIS_HOST = 'localhost'
