@@ -23,10 +23,8 @@ class DevelopmentConfig(Config):
 class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.getenv('PROD_DATABASE_URL')
 
-    CACHE_TYPE = 'redis'
-    CACHE_REDIS_HOST = 'localhost'
-    CACHE_REDIS_PORT = 6379
-    CACHE_REDIS_DB = 0
+    CACHE_REDIS_URL = os.getenv('PROD_REDIS_URL')
+
 
 def get_config():
     env = os.getenv('FLASK_ENV', 'development')
