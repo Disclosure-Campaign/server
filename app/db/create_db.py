@@ -16,6 +16,9 @@ engine = create_engine(DATABASE_URL)
 Session = sessionmaker(bind=engine)
 
 def create_tables():
+    for tbl in reversed(Base.metadata.sorted_tables):
+        engine.execute(tbl.delete())
+
     Base.metadata.create_all(engine)
 
 def insert_legislator_data(data, session):
@@ -64,7 +67,7 @@ def insert_legislator_data(data, session):
     print('Legislator data insertion complete.')
 
 def fill_legislators(session):
-    print('Inserting additional legislator data...')
+    print('Filling legislator data...')
 
     numeric_columns = ['district']
     date_columns = ['birthday']
@@ -87,9 +90,10 @@ def fill_legislators(session):
 
     session.commit()
 
-    print('Additional legislator data insertion complete.')
+    print('Legislator fill complete.')
 
 def fill_districts(session):
+    print('Filling districts...')
     df = pd.read_csv('app/db/static_data/zccd.csv')
 
     for _, row in df.iterrows():
@@ -109,6 +113,8 @@ def fill_districts(session):
         session.add(zip_code_district)
 
     session.commit()
+
+    print('District filling complete.')
 
 def create_db():
     print('Starting database creation...')
