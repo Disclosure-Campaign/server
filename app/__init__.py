@@ -11,7 +11,7 @@ migrate = Migrate()
 db = SQLAlchemy()
 
 origins = [
-    'https://disclosurecampaign.org',
+    'https://www.disclosurecampaign.org',
     'https://disclosure-campaign-site-6852e977de7d.herokuapp.com'
 ]
 
