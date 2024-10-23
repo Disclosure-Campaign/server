@@ -9,7 +9,7 @@ database_url = 'PROD_DATABASE_URL' if os.getenv('FLASK_ENV') == 'production' els
 
 DATABASE_URL = os.getenv(database_url)
 
-engine = create_engine(DATABASE_URL, pool_pre_ping=True)
+engine = create_engine(DATABASE_URL, pool_size=20, max_overflow=0, pool_pre_ping=True)
 Session = sessionmaker(bind=engine)
 
 Base = declarative_base()

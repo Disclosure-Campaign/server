@@ -4,8 +4,9 @@ from datetime import datetime, timedelta
 from concurrent.futures import ThreadPoolExecutor
 import concurrent.futures
 
+from app.db.session import get_session
 from app.config import get_config
-from app.helpers import object_as_dict
+from app.helpers import object_as_dict, find_politician
 from .cleaners import clean_bill_data, add_member_data
 
 config = get_config()
@@ -18,21 +19,25 @@ current_congress = 118
 
 def request_bio_data(params):
     bioguide_id = params[0]
-    politician = params[1]
+    id = params[1]
+
+    session = get_session()
+
+    politician = find_politician(session, {'fecId1': id})
 
     result = None
 
     last_updated_date = politician.lastUpdated
     is_recent = last_updated_date and (datetime.now() - last_updated_date) <= timedelta(days=7)
 
-    has_atributes = True
+    has_attributes = True
 
     for attribute in ['currentTitle', 'depictionImageUrl']:
         if getattr(politician, attribute, None):
-            has_atributes = False
+            has_attributes = False
             break
 
-    if not has_atributes or not is_recent:
+    if not has_attributes or not is_recent:
         url = f'https://{base_url}/member/{bioguide_id}?api_key={CONGRESS_GOV_API_KEY}'
 
         try:

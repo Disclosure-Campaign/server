@@ -14,7 +14,12 @@ from app.db.schemas.models import Politician
 ignore_cache = False
 
 def generate_cache_key(params, key):
-    sorted_params = json.dumps(params, sort_keys=True)
+    if params is None:
+        fixed_params = 'None'
+    else:
+        fixed_params = params
+
+    sorted_params = json.dumps(fixed_params, sort_keys=True)
 
     hashed_params = hashlib.md5(sorted_params.encode('utf-8')).hexdigest()
 
@@ -25,14 +30,18 @@ def check_cache(cache_key):
     cached_data = cache.get(cache_key)
 
     if cached_data:
-        current_app.logger.info(f'Cache hit for key: {cache_key}')
+        print(f'Cache hit for key: {cache_key}')
 
         result = cached_data
 
     return result
 
-def use_cache(callback, params, key):
-    cache_key = generate_cache_key(params, key)
+def use_cache(params):
+    callback = params[0]
+    _params = params[1]
+    key = params[2]
+
+    cache_key = generate_cache_key(_params, key)
     cache_data = check_cache(cache_key)
 
     if (cache_data is not None) and (ignore_cache is False):
@@ -40,10 +49,10 @@ def use_cache(callback, params, key):
 
         result = cache_data
     else:
-        if params is not None:
-            result = callback(params)
+        if _params is not None:
+            result = callback(_params)
         else:
-            callback()
+            result = callback()
 
         cache.set(cache_key, result, timeout=60*60*24)
 

@@ -13,7 +13,7 @@ from app.helpers import find_politician, use_cache
 relevant_years = [2022, 2024]
 
 def cached_get_politician_data(params):
-    result = use_cache(get_politician_data, params, 'politician')
+    result = use_cache([get_politician_data, params, 'politician'])
 
     return result
 
@@ -46,16 +46,16 @@ def get_politician_data(params):
                 info_futures.append(executor.submit(callback, params))
 
             if bioguide_id is not None:
-                add_future(congress_gov_api['request_bio_data'], [bioguide_id, politician])
+                add_future(use_cache, [congress_gov_api['request_bio_data'], [bioguide_id, id], 'bio'])
 
                 if not only_bio:
-                    add_future(congress_gov_api['request_bills_data'], [bioguide_id])
+                    add_future(use_cache, [congress_gov_api['request_bills_data'], [bioguide_id], 'bills'])
             else:
-                add_future(db_functions['get_bio_from_db'], [session, politician])
+                add_future(db_functions['get_bio_from_db'], [session, id])
 
             if (opensecrets_id is not None) and not only_bio:
-                add_future(open_secrets_api['request_cand_contrib'], [opensecrets_id, 2024])
-                add_future(open_secrets_api['request_mem_prof'], [opensecrets_id, 2016])
+                add_future(use_cache, [open_secrets_api['request_cand_contrib'], [opensecrets_id, 2024], 'cand_contrib'])
+                add_future(use_cache, [open_secrets_api['request_mem_prof'], [opensecrets_id, 2016], 'mem_prof'])
 
             info_groups = []
 

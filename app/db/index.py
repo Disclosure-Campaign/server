@@ -62,9 +62,9 @@ def request_searchable_entities():
 
 def get_bio_from_db(params):
     session = params[0]
-    politician = params[1]
+    id = params[1]
 
-    bio_data = find_politician(session, object_as_dict(politician))
+    bio_data = find_politician(session, {'fecId1': id})
 
     return {'dataType': 'bio', 'data': object_as_dict(bio_data)}
 
