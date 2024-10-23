@@ -1,3 +1,6 @@
+import os
+from dotenv import load_dotenv
+
 from flask import Flask
 from flask_cors import CORS
 from flask_migrate import Migrate
@@ -6,13 +9,18 @@ from flask_sqlalchemy import SQLAlchemy
 from app.cache import configure_cache
 from app.config import get_config
 
+load_dotenv()
+
 migrate = Migrate()
 
 db = SQLAlchemy()
 
 origins = [
-    'https://www.disclosurecampaign.org',
-    'https://disclosure-campaign-site-6852e977de7d.herokuapp.com'
+    'www.disclosurecampaign.org',
+    os.getenv('HEROKU_SITE_URL'),
+    os.getenv('CLOUDFLARE_NAMESERVER_1'),
+    os.getenv('CLOUDFLARE_NAMESERVER_2'),
+
 ]
 
 def create_app():
