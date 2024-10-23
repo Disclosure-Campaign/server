@@ -8,9 +8,14 @@ from app.APIs.congress_gov.index import congress_gov_api
 from app.APIs.open_fec.index import open_fec_api
 from app.APIs.open_secrets.index import open_secrets_api
 
-from app.helpers import find_politician
+from app.helpers import find_politician, use_cache
 
 relevant_years = [2022, 2024]
+
+def cached_get_politician_data(params):
+    result = use_cache(get_politician_data, params, 'politician')
+
+    return result
 
 def get_politician_data(params):
     id = params[0]
@@ -90,7 +95,7 @@ def request_standard_politician_data(params):
         info_futures = []
 
         for id in ids:
-            info_futures.append(executor.submit(get_politician_data, [id, only_bio]))
+            info_futures.append(executor.submit(cached_get_politician_data, [id, only_bio]))
 
         for future in concurrent.futures.as_completed(info_futures):
             data = future.result()

@@ -40,7 +40,10 @@ def use_cache(callback, params, key):
 
         result = cache_data
     else:
-        result = callback(params)
+        if params is not None:
+            result = callback(params)
+        else:
+            callback()
 
         cache.set(cache_key, result, timeout=60*60*24)
 

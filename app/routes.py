@@ -9,7 +9,7 @@ bp = Blueprint('api', __name__)
 @bp.route('/request_searchable_entities')
 
 def get_searchable_entities():
-    result = db_functions['request_searchable_entities']()
+    result = use_cache(db_functions['request_searchable_entities'], None, 'searchable')
 
     return result
 
