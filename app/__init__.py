@@ -16,7 +16,7 @@ migrate = Migrate()
 db = SQLAlchemy()
 
 origins = [
-    'disclosurecampaign.org',
+    'https://disclosurecampaign.org',
     'https://www.disclosurecampaign.org',
     os.getenv('HEROKU_SITE_URL'),
     os.getenv('CLOUDFLARE_NAMESERVER_1'),
