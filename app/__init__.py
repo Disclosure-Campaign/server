@@ -16,11 +16,10 @@ migrate = Migrate()
 db = SQLAlchemy()
 
 origins = [
-    'www.disclosurecampaign.org',
+    'https://www.disclosurecampaign.org',
     os.getenv('HEROKU_SITE_URL'),
     os.getenv('CLOUDFLARE_NAMESERVER_1'),
     os.getenv('CLOUDFLARE_NAMESERVER_2'),
-
 ]
 
 def create_app():
