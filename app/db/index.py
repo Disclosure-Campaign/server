@@ -66,6 +66,9 @@ def get_bio_from_db(params):
 
     bio_data = find_politician(session, {'fecId1': id})
 
+    session.commit()
+    session.close()
+
     return {'dataType': 'bio', 'data': object_as_dict(bio_data)}
 
 db_functions = {

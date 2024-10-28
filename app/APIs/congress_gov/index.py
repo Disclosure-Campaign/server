@@ -57,6 +57,9 @@ def request_bio_data(params):
     else:
         result = object_as_dict(politician)
 
+    session.commit()
+    session.close()
+
     return {'dataType': 'bio', 'data': result}
 
 def request_bills_data(params):
