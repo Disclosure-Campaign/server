@@ -39,14 +39,16 @@ def get_current_title(terms):
     return title
 
 def add_member_data(politician, member_data):
-    depiction = member_data['depiction']
+    if 'depiction' in member_data:
+        depiction = member_data['depiction']
 
-    setattr(politician, 'depictionAttribution', depiction['attribution'])
-    setattr(politician, 'depictionImageUrl', depiction['imageUrl'])
+        setattr(politician, 'depictionAttribution', depiction['attribution'])
+        setattr(politician, 'depictionImageUrl', depiction['imageUrl'])
 
-    title = get_current_title(member_data['terms'])
+    if 'terms' in member_data:
+        title = get_current_title(member_data['terms'])
 
-    if title is not None:
-        setattr(politician, 'currentTitle', title)
+        if title is not None:
+            setattr(politician, 'currentTitle', title)
 
     politician.lastUpdated = datetime.now()

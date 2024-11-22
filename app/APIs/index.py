@@ -18,14 +18,12 @@ def cached_get_politician_data(params):
     return result
 
 def get_politician_data(params):
-    id = params[0]
-    only_bio = params[1] == 'true'
+    fec_id = params[0]
+    dataGroup = params[1]
 
+    data = {}
     session = get_session()
-
-    data = None
-
-    politician = find_politician(session, {'fecId1': id})
+    politician = find_politician(session, {'fecId1': fec_id})
 
     if politician:
         opensecrets_id = getattr(politician, 'opensecretsId')
@@ -39,70 +37,48 @@ def get_politician_data(params):
             if _id is not None:
                 fec_ids.append(_id)
 
-        with ThreadPoolExecutor() as executor:
-            info_futures = []
+        if dataGroup == 'bio':
+            # add bio from db idea
+            result = use_cache([congress_gov_api['request_bio_data'], [bioguide_id, fec_id], 'bio'])
+        elif dataGroup == 'sponsoredLegislation':
+            result = use_cache([congress_gov_api['request_bills_data'], [bioguide_id, dataGroup], 'bills'])
+        elif dataGroup == 'cosponsoredLegislation':
+            result = use_cache([congress_gov_api['request_bills_data'], [bioguide_id, dataGroup], 'bills'])
+        elif dataGroup == 'candContrib':
+            result = use_cache([open_secrets_api['request_cand_contrib'], [opensecrets_id, 2024], 'cand_contrib'])
+        elif dataGroup == 'memProf':
+            result = use_cache([open_secrets_api['request_mem_prof'], [opensecrets_id, 2016], 'mem_prof'])
 
-            def add_future(callback, params):
-                info_futures.append(executor.submit(callback, params))
-
-            if bioguide_id is not None:
-                add_future(use_cache, [congress_gov_api['request_bio_data'], [bioguide_id, id], 'bio'])
-
-                if not only_bio:
-                    add_future(use_cache, [congress_gov_api['request_bills_data'], [bioguide_id], 'bills'])
-            else:
-                add_future(db_functions['get_bio_from_db'], [session, id])
-
-            if (opensecrets_id is not None) and not only_bio:
-                add_future(use_cache, [open_secrets_api['request_cand_contrib'], [opensecrets_id, 2024], 'cand_contrib'])
-                add_future(use_cache, [open_secrets_api['request_mem_prof'], [opensecrets_id, 2016], 'mem_prof'])
-
-            info_groups = []
-
-            for future in concurrent.futures.as_completed(info_futures):
-                result = future.result()
-
-                if isinstance(result, Exception):
-                    print(f'Error occurred: {result}')
-                elif result['data'] is None:
-                    data_type = result['dataType']
-
-                    print(f'{data_type} data unavailable')
-                else:
-                    info_groups.append(result)
-
-            data = {}
-
-            for group in info_groups:
-                if group['dataType'] == 'billData':
-                    data['sponsoredLegislation'] = group['data']['sponsoredLegislation']
-                    data['cosponsoredLegislation'] = group['data']['cosponsoredLegislation']
-                else:
-                    data[group['dataType']] = group['data']
+        if isinstance(result, Exception):
+            print(f'Error occurred: {result}')
+        elif result['data'] is None:
+            print(f'{dataGroup} data unavailable')
+        else:
+            data = {dataGroup: result['data']}
 
     session.commit()
     session.close()
 
-    return {id: data}
+    return {fec_id: data}
 
 def request_standard_politician_data(params):
-    ids = params['ids'].split('-')
-    only_bio = params['onlyBio']
+    fec_ids = params['ids'].split('-')
+    dataGroup = params['dataGroup']
 
     all_data = {}
 
     with ThreadPoolExecutor() as executor:
         info_futures = []
 
-        for id in ids:
-            info_futures.append(executor.submit(cached_get_politician_data, [id, only_bio]))
+        for fec_id in fec_ids:
+            info_futures.append(executor.submit(cached_get_politician_data, [fec_id, dataGroup]))
 
         for future in concurrent.futures.as_completed(info_futures):
             data = future.result()
 
-            for id in ids:
-                if id in data:
-                    all_data[id] = data[id]
+            for fec_id in fec_ids:
+                if fec_id in data:
+                    all_data[fec_id] = data[fec_id]
 
     return all_data
 

@@ -20,7 +20,6 @@ def generate_cache_key(params, key):
         fixed_params = params
 
     sorted_params = json.dumps(fixed_params, sort_keys=True)
-
     hashed_params = hashlib.md5(sorted_params.encode('utf-8')).hexdigest()
 
     return f'{key}-{hashed_params}'
