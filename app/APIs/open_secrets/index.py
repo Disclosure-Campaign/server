@@ -9,14 +9,9 @@ from .cleaners import clean_cand_contrib_data, parse_member_profile
 from app.helpers import fuzzy_match
 
 generic = [
-    'group',
-    'fund',
-    'llc',
-    'ventures',
-    'trading',
-    'industry',
-    'coalition',
-    'campaign'
+    'group', 'fund', 'llc', 'ventures', 'inc',
+    'industry', 'coalition', 'campaign','trading',
+    'and'
 ]
 
 config = get_config()
@@ -62,7 +57,7 @@ def request_cand_contrib(params):
     except requests.RequestException as e:
         print(f'Error: {e}')
 
-    return {'dataType': 'candContrib', 'data': result}
+    return {'data': result}
 
 def request_mem_prof(params):
     id = params[0]
@@ -83,28 +78,29 @@ def request_mem_prof(params):
     except requests.RequestException as e:
         print(f'Error: {e}')
 
-    return {'dataType': 'memProf', 'data': result}
+    return {'data': result}
 
 def request_org_data(params):
     org_slug = params['org_slug']
 
     id = find_org_id(org_slug)
 
-    url = f'https://{base_url}/?method=orgSummary&id={id}&output=json&apikey={OPEN_SECRETS_API_KEY}'
+    result = {}
 
-    result = None
+    if id is not None:
+        url = f'https://{base_url}/?method=orgSummary&id={id}&output=json&apikey={OPEN_SECRETS_API_KEY}'
 
-    try:
-        response = requests.get(url)
+        try:
+            response = requests.get(url)
 
-        if response.status_code == 200:
-            result = response.json()['response']['organization']['@attributes']
-        else:
-            print(f'Error: API request failed with status code {response.status_code}')
-    except requests.RequestException as e:
-        print(f'Error: {e}')
+            if response.status_code == 200:
+                result = response.json()['response']['organization']['@attributes']
+            else:
+                print(f'Error: API request failed with status code {response.status_code}')
+        except requests.RequestException as e:
+            print(f'Error: {e}')
 
-    return {'org': result}
+    return result
 
 def find_org_id(org_slug):
     org_name = org_slug.replace('-', ' ')
@@ -113,7 +109,7 @@ def find_org_id(org_slug):
 
     with ThreadPoolExecutor() as executor:
         org_name_parts = org_slug.split('-')
-        cleaned_org_name_parts = [part for part in org_name_parts if part.lower() not in generic]
+        cleaned_org_name_parts = [part for part in org_name_parts if ((part.lower() not in generic) and len(part) > 2)]
         org_futures = []
         possible_orgs = []
 
@@ -129,27 +125,36 @@ def find_org_id(org_slug):
             if isinstance(result, Exception):
                 print(f'Error occurred: {result}')
             else:
-                for _org in result.json()['response']['organization']:
-                    org = _org['@attributes']
+                try:
+                    for _org in result.json()['response']['organization']:
+                        if isinstance(_org, dict):
+                            org = _org['@attributes']
 
-                    if org['orgname'].lower() == org_name:
-                        return org['orgid']
-                    else:
-                        org['score'] = fuzzy_match(org['orgname'], org_name)
+                            if org['orgname'].lower() == org_name:
+                                return org['orgid']
+                            else:
+                                org['score'] = fuzzy_match(org['orgname'], org_name)
 
-                        possible_orgs.append(org)
+                                possible_orgs.append(org)
+                except:
+                    print('No orgs returned')
 
-    best_score = 0
-    best_org = possible_orgs[0]
+    id = None
 
-    for org in possible_orgs[1:]:
-        score = org['score']
+    if len(possible_orgs) > 0:
+        best_score = 0
+        best_org = possible_orgs[0]
 
-        if score > best_score:
-            best_org = org
-            best_score = score
+        for org in possible_orgs[1:]:
+            score = org['score']
 
-    return best_org['orgid']
+            if score > best_score:
+                best_org = org
+                best_score = score
+
+        id = best_org['orgid']
+
+    return id
 
 open_secrets_api = {
     'request_legislators': request_legislators,

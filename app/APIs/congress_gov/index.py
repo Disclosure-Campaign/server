@@ -64,34 +64,27 @@ def request_bio_data(params):
 
 def request_bills_data(params):
     bioguideId = params[0]
+    bill_group = params[1]
 
     url = f'https://{base_url}/member/'
 
-    with ThreadPoolExecutor() as executor:
-        methods = ['sponsored-legislation', 'cosponsored-legislation']
+    method = {
+        'sponsoredLegislation': 'sponsored-legislation',
+        'cosponsoredLegislation': 'cosponsored-legislation'
+    }[bill_group];
 
-        future_to_type = {
-            executor.submit(requests.get, f'{url}{bioguideId}/{method}?limit=250&api_key={CONGRESS_GOV_API_KEY}'): method
-            for method in methods
-        }
+    try:
+        result = requests.get(f'{url}{bioguideId}/{method}?limit=250&api_key={CONGRESS_GOV_API_KEY}')
 
-        bill_data = {}
+        data = result.json()
 
-        for index, future in enumerate(concurrent.futures.as_completed(future_to_type)):
-            method = future_to_type[future]
+        cleaned_data = clean_bill_data(data, bill_group)
+    except Exception as e:
+        print(f'Error occurred while processing {method}: {e}')
 
-            try:
-                result = future.result().json()
-                data_type = 'sponsoredLegislation' if method == 'sponsored-legislation' else 'cosponsoredLegislation'
+        cleaned_data = None
 
-                cleaned_data = clean_bill_data(result, data_type)
-                bill_data[data_type] = cleaned_data
-            except Exception as e:
-                print(f'Error occurred while processing {method}: {e}')
-
-                bill_data = None
-
-    return {'dataType': 'billData', 'data': bill_data}
+    return {'data': cleaned_data}
 
 def request_bill_data(params):
     congress, type, id = params['congress'], params['type'], params['id']
@@ -99,7 +92,7 @@ def request_bill_data(params):
     url = f'https://{base_url}/bill/{congress}/{type}/{id}'
 
     with ThreadPoolExecutor() as executor:
-        methods = ['', '/summaries', ]
+        methods = ['', 'summaries']
 
         future_to_type = {
             executor.submit(requests.get, f'{url}/{method}?limit=250&api_key={CONGRESS_GOV_API_KEY}'): method
@@ -113,9 +106,10 @@ def request_bill_data(params):
 
             try:
                 result = future.result().json()
-                data_type = 'summaries' if method == '/summaries' else 'bill'
+                data_type = 'summaries' if method == 'summaries' else 'bill'
+                key = data_type if method == 'summaries' else 'attributes'
 
-                bill_data[data_type] = result[data_type]
+                bill_data[key] = result[data_type]
             except Exception as e:
                 print(f'Error occurred while processing {method}: {e}')
 

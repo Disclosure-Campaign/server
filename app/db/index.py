@@ -13,8 +13,9 @@ def request_searchable_entities():
     politician_field_list = [
         'fullName',
         'lastName',
-        'bioguideId',
         'fecId1',
+        'bioguideId',
+        'opensecretsId',
         'currentTitle',
         'party',
         'candidateOfficeState',
@@ -62,12 +63,9 @@ def request_searchable_entities():
 
 def get_bio_from_db(params):
     session = params[0]
-    id = params[1]
+    fec_id = params[1]
 
-    bio_data = find_politician(session, {'fecId1': id})
-
-    session.commit()
-    session.close()
+    bio_data = find_politician(session, {'fecId1': fec_id})
 
     return {'dataType': 'bio', 'data': object_as_dict(bio_data)}
 
