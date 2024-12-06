@@ -42,8 +42,11 @@ def add_member_data(politician, member_data):
     if 'depiction' in member_data:
         depiction = member_data['depiction']
 
-        setattr(politician, 'depictionAttribution', depiction['attribution'])
-        setattr(politician, 'depictionImageUrl', depiction['imageUrl'])
+        if 'attribution' in depiction:
+            setattr(politician, 'depictionAttribution', depiction['attribution'])
+
+        if 'imageUrl' in depiction:
+            setattr(politician, 'depictionImageUrl', depiction['imageUrl'])
 
     if 'terms' in member_data:
         title = get_current_title(member_data['terms'])
