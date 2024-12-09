@@ -53,6 +53,8 @@ def get_politician_data(params):
             print(f'Error occurred: {result}')
         elif result['data'] is None:
             print(f'{dataGroup} data unavailable')
+
+            data = {dataGroup: 'unavailable'}
         else:
             data = {dataGroup: result['data']}
 

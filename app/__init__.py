@@ -21,7 +21,7 @@ origins = [
     os.getenv('HEROKU_SITE_URL'),
     os.getenv('CLOUDFLARE_NAMESERVER_1'),
     os.getenv('CLOUDFLARE_NAMESERVER_2'),
-    'http://localhost:3000'
+    # 'http://localhost:3000'
 ]
 
 def create_app():

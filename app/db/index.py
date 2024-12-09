@@ -13,6 +13,7 @@ def request_searchable_entities():
     politician_field_list = [
         'fullName',
         'lastName',
+        'nickname',
         'fecId1',
         'bioguideId',
         'opensecretsId',

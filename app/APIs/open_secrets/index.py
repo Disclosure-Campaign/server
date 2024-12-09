@@ -10,7 +10,7 @@ from app.helpers import fuzzy_match
 
 generic = [
     'group', 'fund', 'llc', 'ventures', 'inc',
-    'industry', 'coalition', 'campaign','trading',
+    'industry', 'coalition', 'campaign', 'trading',
     'and'
 ]
 

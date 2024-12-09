@@ -8,8 +8,12 @@ from app.db.custom.add_presidential_data import add_presidential_data
 from app.helpers import split_name, construct_name, find_politician
 from app.db.static_data.party_codes import party_codes
 
+from app.helpers import update_politician
+
 def update_politicians_from_txt(txt_path, session):
     print('Updating politicians from Opensecrets...')
+
+    current_year = datetime.now().year
 
     with open(txt_path, 'r') as file:
         for line in file:
@@ -22,6 +26,7 @@ def update_politicians_from_txt(txt_path, session):
                 print(f'Skipping row with name containing a number: {fullName}')
                 continue
 
+            electionYear = row[3]
             state = row[4]
             office = row[5]
             district = row[6]
@@ -35,7 +40,7 @@ def update_politicians_from_txt(txt_path, session):
                 'firstName': parts[1],
                 'middleName': parts[2],
                 'party': 'Unknown party' if row[2] not in party_codes else party_codes[row[2]],
-                'candidateElectionYear': row[3],
+                'candidateElectionYear': electionYear,
                 'candidateOfficeState': state,
                 'candidateOffice': office,
                 'candidateOfficeDistrict': district,
@@ -54,10 +59,8 @@ def update_politicians_from_txt(txt_path, session):
             existing_politician = find_politician(session, {'fecId1': fec_id})
 
             if existing_politician:
-                for key, value in column_values.items():
-                    if value != '':
-                        setattr(existing_politician, key, value)
-            else:
+                update_politician(existing_politician, column_values)
+            elif int(electionYear) == current_year:
                 column_values['fecId1'] = fec_id
 
                 currentTitle = 'Candidate for '
@@ -133,12 +136,10 @@ def update_politicians_from_xls(xls_path, session):
             if existing_politician:
                 usable_data = {'opensecretsId': opensecretsId}
 
-                for key, value in usable_data.items():
-                    if value != '':
-                        setattr(existing_politician, key, value)
-            else:
-                politician = Politician(**column_values)
-                session.add(politician)
+                update_politician(existing_politician, usable_data)
+            # else:
+            #     politician = Politician(**column_values)
+            #     session.add(politician)
 
     session.commit()
 
@@ -153,9 +154,8 @@ def ingest():
     update_politicians_from_xls('app/db/static_data/CRP_IDS.xls', session)
     add_presidential_data(session)
 
-    print('Ingest complete.')
-
     session.close()
+    print('Ingest complete.')
 
 if __name__ == '__main__':
     ingest()
