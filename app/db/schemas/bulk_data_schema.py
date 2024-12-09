@@ -22,6 +22,7 @@ candidate_fields = [
 spreadsheet_fields = [
   {'key': 'middleName', 'data_type': 'string'},
   {'key': 'fullName', 'data_type': 'string'},
+  {'key': 'nickname', 'data_type': 'string'},
   {'key': 'opensecretsId', 'data_type': 'string'},
   {'key': 'birthday', 'data_type': 'dateTime'},
   {'key': 'type', 'data_type': 'string'},

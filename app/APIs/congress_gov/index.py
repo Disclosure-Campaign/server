@@ -22,7 +22,6 @@ def request_bio_data(params):
     id = params[1]
 
     session = get_session()
-
     politician = find_politician(session, {'fecId1': id})
 
     result = None
@@ -76,9 +75,12 @@ def request_bills_data(params):
     try:
         result = requests.get(f'{url}{bioguideId}/{method}?limit=250&api_key={CONGRESS_GOV_API_KEY}')
 
-        data = result.json()
+        if result.status_code == 200:
+            data = result.json()
 
-        cleaned_data = clean_bill_data(data, bill_group)
+            cleaned_data = clean_bill_data(data, bill_group)
+        else:
+            cleaned_data = None
     except Exception as e:
         print(f'Error occurred while processing {method}: {e}')
 

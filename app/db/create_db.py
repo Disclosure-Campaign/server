@@ -4,8 +4,9 @@ from dotenv import load_dotenv
 
 from sqlalchemy import create_engine
 
-from app.db.session import get_session
 from app.db.schemas.models import Base, Politician, Zip
+from app.helpers import update_politician, find_politician
+from app.db.session import get_session
 
 load_dotenv()
 
@@ -34,6 +35,7 @@ def insert_legislator_data(data, session):
             'firstName': row['first_name'],
             'middleName': row['middle_name'],
             'lastName': row['last_name'],
+            'nickname': row['nickname'],
             'fullName': row['full_name'],
             'bioguideId': row['bioguide_id'],
             'opensecretsId': row['opensecrets_id'],
@@ -57,9 +59,13 @@ def insert_legislator_data(data, session):
         else:
             column_values['fecId1'] = row['bioguide_id']
 
-        politician = Politician(**column_values)
+        existing_politician = find_politician(session, column_values)
 
-        session.add(politician)
+        if existing_politician:
+            update_politician(existing_politician, column_values)
+        else:
+            politician = Politician(**column_values)
+            session.add(politician)
 
     session.commit()
 

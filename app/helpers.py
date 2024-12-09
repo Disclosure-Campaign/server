@@ -1,4 +1,3 @@
-from flask import current_app
 import hashlib
 import json
 import re
@@ -137,3 +136,8 @@ def object_as_dict(obj):
 
 def fuzzy_match(name1, name2):
     return fuzz.token_sort_ratio(name1, name2)
+
+def update_politician(politician, column_values):
+    for key, value in column_values.items():
+        if value != '':
+            setattr(politician, key, value)
