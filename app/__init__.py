@@ -32,7 +32,7 @@ def create_app():
     print('Starting server...')
 
     server = Flask(__name__)
-    CORS(server, resources={r'/*': {'origins': origins}})
+    # CORS(server, resources={r'/*': {'origins': origins}})
 
     config_class = get_config()
     server.config.from_object(config_class())
