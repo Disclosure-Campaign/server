@@ -26,6 +26,8 @@ origins = [
     # 'http://localhost:3000'
 ]
 
+origins = '*'
+
 def create_app():
     print('Starting server...')
 
