@@ -16,6 +16,8 @@ migrate = Migrate()
 db = SQLAlchemy()
 
 origins = [
+    'disclosurecampaign.org',
+    'www.disclosurecampaign.org',
     'https://disclosurecampaign.org',
     'https://www.disclosurecampaign.org',
     os.getenv('HEROKU_SITE_URL'),
