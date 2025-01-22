@@ -43,7 +43,7 @@ def use_cache(params):
     cache_data = check_cache(cache_key)
 
     if (cache_data is not None) and (ignore_cache is False):
-        print('using cache')
+        print(f'Using cache for key: {cache_key}')
 
         result = cache_data
     else:
