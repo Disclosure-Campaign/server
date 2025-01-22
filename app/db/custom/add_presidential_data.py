@@ -3,31 +3,26 @@ from app.helpers import find_politician, update_politician
 
 candidate_info_map = [
     {
-        'lastName': 'Harris', 'fecId1': 'P00009423',
-        'opensecretsId': 'N00036915', 'bioguideId': 'H001075',
-        'currentTitle': 'Vice President',
+        'lastName': 'Harris', 'firstName': 'Kamala', 'fullName': 'Kamala Harris', 'fecId1': 'P00009423',
+        'opensecretsId': 'N00036915', 'bioguideId': 'H001075', 'party': 'Democratic Party',
+        'currentTitle': 'Former Vice President',
         'website': 'https://kamalaharris.com',
-        'contactForm': 'https://kamalaharris.com/contact-us/', 'twitter': 'VP',
-        'facebook': 'KamalaHarris'
+        'contactForm': 'https://kamalaharris.com/connect/'
 
     },
     {
-        'lastName': 'Trump','fecId1': 'P80001571',
-        'opensecretsId': 'N00023864',
+        'lastName': 'Trump', 'firstName': 'Donald', 'fullName': 'Donald J. Trump', 'fecId1': 'P80001571',
+        'opensecretsId': 'N00023864', 'party': 'Republican Party',
         'depictionImageUrl': 'https://upload.wikimedia.org/wikipedia/commons/5/56/Donald_Trump_official_portrait.jpg',
         'depictionAttribution': 'https://en.m.wikipedia.org/wiki/File:Donald_Trump_official_portrait.jpg',
-        'currentTitle': 'President Elect',
+        'currentTitle': 'President',
         'website': 'https://www.donaldjtrump.com/',
-        'contactForm': 'https://www.donaldjtrump.com/join', 'twitter': 'realDonaldTrump',
-        'facebook': 'DonaldTrump'
+        'contactForm': 'https://www.donaldjtrump.com/join'
     },
     {
-        'lastName': 'Biden', 'fecId1': 'P80000722',
-        'opensecretsId': 'N00001669', 'bioguideId': 'B000444',
-        'currentTitle': 'President',
-        'website': 'https://www.whitehouse.gov/administration/president-biden',
-        'contactForm': 'https://www.whitehouse.gov/contact', 'twitter': 'potus',
-        'facebook': 'POTUS/s'
+        'lastName': 'Biden', 'firstName': 'Joseph', 'fullName': 'Joseph Biden', 'fecId1': 'P80000722',
+        'opensecretsId': 'N00001669', 'bioguideId': 'B000444', 'party': 'Democratic Party',
+        'currentTitle': 'Former President', 'nickname': 'Joe'
     }
 ]
 
@@ -55,7 +50,3 @@ def add_presidential_data(session):
     session.commit()
 
     print('Added presidential data...')
-
-
-
-

@@ -21,7 +21,11 @@ def request_searchable_entities():
         'party',
         'candidateOfficeState',
         'candidateOfficeDistrict',
-        'depictionImageUrl'
+        'depictionImageUrl',
+        'website',
+        'contactForm',
+        'twitter',
+        'facebook'
     ]
 
     sortedPoliticians = []

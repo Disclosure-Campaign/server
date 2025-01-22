@@ -99,12 +99,12 @@ def update_politicians_from_xls(xls_path, session):
 
     df = pd.read_excel(xls_path, sheet_name=sheets_to_process, skiprows=start_row)
 
-    num_cols = df[sheets_to_process[0]].shape[1]
-    last_col_letter = chr(ord(start_col) + num_cols - 1)
+    # num_cols = df[sheets_to_process[0]].shape[1]
+    # last_col_letter = chr(ord(start_col) + num_cols - 1)
 
-    usecols_range = f'{start_col}:{last_col_letter}'
+    # usecols_range = f'{start_col}:{last_col_letter}'
 
-    excel_data = pd.read_excel(xls_path, sheet_name=sheets_to_process, skiprows=start_row, usecols=usecols_range)
+    excel_data = pd.read_excel(xls_path, sheet_name=sheets_to_process, skiprows=start_row, usecols='B:F')
 
     for sheet_name, data in excel_data.items():
         print(f'Ingesting sheet: {sheet_name}')
