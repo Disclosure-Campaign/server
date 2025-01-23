@@ -30,7 +30,7 @@ def create_app():
     print('Starting server...')
 
     server = Flask(__name__)
-    CORS(server, resources={r'/*': {'origins': '*'}})
+    CORS(server, resources={r'/*': {'origins': origins}})
 
     config_class = get_config()
     server.config.from_object(config_class())
@@ -43,6 +43,6 @@ def create_app():
     from app.routes import bp
     server.register_blueprint(bp)
 
-    print('Server started.')
+    print('Server started. Version 1.3.3')
 
     return server
