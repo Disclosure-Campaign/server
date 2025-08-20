@@ -26,7 +26,7 @@ def get_politician_data(params):
     politician = find_politician(session, {'fecId1': fec_id})
 
     if politician:
-        opensecrets_id = getattr(politician, 'opensecretsId')
+        # opensecrets_id = getattr(politician, 'opensecretsId')
         bioguide_id = getattr(politician, 'bioguideId')
 
         fec_ids = []
@@ -44,10 +44,10 @@ def get_politician_data(params):
             result = use_cache([congress_gov_api['request_bills_data'], [bioguide_id, dataGroup], 'bills'])
         elif dataGroup == 'cosponsoredLegislation':
             result = use_cache([congress_gov_api['request_bills_data'], [bioguide_id, dataGroup], 'bills'])
-        elif dataGroup == 'candContrib':
-            result = use_cache([open_secrets_api['request_cand_contrib'], [opensecrets_id, 2024], 'cand_contrib'])
-        elif dataGroup == 'memProf':
-            result = use_cache([open_secrets_api['request_mem_prof'], [opensecrets_id, 2016], 'mem_prof'])
+        # elif dataGroup == 'candContrib':
+        #     result = use_cache([open_secrets_api['request_cand_contrib'], [opensecrets_id, 2024], 'cand_contrib'])
+        # elif dataGroup == 'memProf':
+        #     result = use_cache([open_secrets_api['request_mem_prof'], [opensecrets_id, 2016], 'mem_prof'])
 
         if isinstance(result, Exception):
             print(f'Error occurred: {result}')
