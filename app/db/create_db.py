@@ -135,5 +135,5 @@ def create_db():
 
     print('Database creation complete.')
 
-if __name__ == 'main':
+if __name__ == '__main__':
     create_db()
