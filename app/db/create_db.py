@@ -13,7 +13,7 @@ database_url = 'PROD_DATABASE_URL' if os.getenv('FLASK_ENV') == 'production' els
 
 DATABASE_URL = os.getenv(database_url)
 
-from app.db.session import engine
+engine = create_engine(DATABASE_URL, pool_size=20, max_overflow=0)
 
 def create_tables():
     Base.metadata.drop_all(engine)
