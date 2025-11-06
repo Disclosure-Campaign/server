@@ -32,7 +32,6 @@ def request_politician_data(params):
 
     return result
 
-
 congress_gov_api = {
     'request_politician_data': request_politician_data
 }
