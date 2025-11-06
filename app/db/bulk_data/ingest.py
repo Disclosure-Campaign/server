@@ -1,5 +1,4 @@
 import re
-import pandas as pd
 from datetime import datetime
 
 from app.db.session import get_session
@@ -96,6 +95,9 @@ def update_politicians_from_xls(xls_path, session):
     sheets_to_process = ['Candidate Ids - 2024', 'Candidate Ids - 2022']
     start_row = 13
     start_col = 'B'
+
+    # Import pandas lazily to avoid loading it in the web dyno on import
+    import pandas as pd
 
     df = pd.read_excel(xls_path, sheet_name=sheets_to_process, skiprows=start_row)
 

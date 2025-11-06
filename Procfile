@@ -1,1 +1,1 @@
-web: gunicorn run:app --log-file -
+web: gunicorn run:app --log-file - --workers 1 --threads 2

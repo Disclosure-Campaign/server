@@ -1,5 +1,4 @@
 import os
-import pandas as pd
 from dotenv import load_dotenv
 
 from sqlalchemy import create_engine
@@ -14,7 +13,7 @@ database_url = 'PROD_DATABASE_URL' if os.getenv('FLASK_ENV') == 'production' els
 
 DATABASE_URL = os.getenv(database_url)
 
-engine = create_engine(DATABASE_URL, pool_size=20, max_overflow=0)
+engine = create_engine(DATABASE_URL, pool_size=5, max_overflow=2)
 
 def create_tables():
     Base.metadata.drop_all(engine)
@@ -77,6 +76,9 @@ def fill_legislators(session):
     numeric_columns = ['district']
     date_columns = ['birthday']
 
+    # Import pandas lazily to avoid pulling it into the web dyno at import time
+    import pandas as pd
+
     df = pd.read_csv('app/db/static_data/legislators_current.csv')
 
     fill_values = {}
@@ -99,6 +101,9 @@ def fill_legislators(session):
 
 def fill_districts(session):
     print('Filling districts...')
+    # Import pandas lazily to avoid pulling it into the web dyno at import time
+    import pandas as pd
+
     df = pd.read_csv('app/db/static_data/zccd.csv')
 
     for _, row in df.iterrows():
